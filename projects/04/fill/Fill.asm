@@ -12,14 +12,32 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
-	.text
-main:
 
+(LOOP)
+	@KBD
+	D=M
+
+	// If keyboard is pressed, then D > 0, jump to BLACK
+	@BLACK
+	D; JGT // If D > 0, then jump to BLACK
 	
-
-	jal endelse
-else:
+	// If keyboard is not pressed, then D = 0 and jump to WHITE
 
 
-endelse:
-	jal main
+(BLACK)
+	@SCREEN
+	M=D
+
+(WHITE)
+	@SCREEN
+	M=D
+
+
+
+
+
+
+
+
+@LOOP
+0; JMP
