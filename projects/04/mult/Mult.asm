@@ -13,22 +13,72 @@
 
 // MULT RAM[0] * RAM[R1] = RAM[R2]
 
-(MAIN)
+(main)
+	// Load the value from R0 into D
 	@R0
-	r_zero=M // R0=0
+	D=M // D=R0
+
+	// Check if R0 >= 0
+	@endR0Check
+	D; JLT // R0<0
+	// Load the value from R1 into D
 	@R1
-	r_one=M // R1=1
+	D=M 
+	// Check if R1 >= 0
+	@endR1Check
+	D; JLT // R1<0
 
-	@END
-	r_zero; JGT // R0>=0
-	r_one; JGT // R1>=0
-	
+	// Load 0 into R2
+	@R2
+	M=0
+(loop)
+	// Check if R0=0
+	@R0
+	D=M // D=R0
 
-(END)
+	@endLoopCheck
+	D; JLE // R0<=0
+
+
+	// Calculate R2=R2+R0
+	@R2
+	M=M+D // R2=R2+R0
+
+	@R1
+	M=M-1 // R1=R1-1
+
+	@loop
+	0; JMP // Jump to loop
+
+(endLoopCheck)
+    @end
+    0; JMP // Jump back to the loop
+
+(endR0Check)
+    @end
+    0; JMP // Jump to end
+
+(endR1Check)
+    @end
+    0; JMP // Jump to end
+
+(end)
+	@end
+	0 ; JMP 	// loop indefinitely
 
 
 
 
 
 
+// 	// Check if R0*R1 < 32768
+// 	@32768
+// 	D=A // Load 32768 into D
 
+// 	@R2
+// 	D=M-D // D=R2-32768
+// 	@SET
+// 	D; JLT // R2<32768; if R2>0, jump to SET
+// (SET)
+// 	@R2
+// 	M=0 // R2=0
