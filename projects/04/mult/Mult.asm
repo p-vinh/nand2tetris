@@ -10,3 +10,25 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+// MULT RAM[0] * RAM[R1] = RAM[R2]
+
+(MAIN)
+	@R0
+	r_zero=M // R0=0
+	@R1
+	r_one=M // R1=1
+
+	@END
+	r_zero; JGT // R0>=0
+	r_one; JGT // R1>=0
+	
+
+(END)
+
+
+
+
+
+
+
