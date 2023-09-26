@@ -52,20 +52,3 @@
 (END)
 	@END
 	0 ;JMP 	// loop indefinitely
-
-
-
-
-
-
-// 	// Check if R0*R1 < 32768
-// 	@32768
-// 	D=A // Load 32768 into D
-
-// 	@R2
-// 	D=M-D // D=R2-32768
-// 	@SET
-// 	D; JLT // R2<32768; if R2>0, jump to SET
-// (SET)
-// 	@R2
-// 	M=0 // R2=0
