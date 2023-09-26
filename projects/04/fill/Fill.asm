@@ -13,59 +13,48 @@
 
 // Put your code here.
 
-(LOOP)
-	@SCREEN
+// Writes the pixels from the bottom right corner to the top left corner
+// Since we are adding 8192 to the SCREEN's first address, we are writing the pixels from the bottom right corner to the top left corner
+(INIT)
+	@8192 // We load D with 8192 because 32 * 256 = 8192. 32 is the number of pixels in a row, and 256 is the number of rows
 	D=A
-	@R0
+	@0 // Count of the max number of pixels that can be colored 8192
 	M=D
-	
+
+(LOOP)
+	@0
+	M=M-1 // Decrement count by 1
+	D=M // D = Count
+
+	@INIT
+	D; JLT // If D < 0, then jump to INIT, to reset the count
 
 	@KBD
 	D=M
-	// If keyboard is pressed, then D > 0, jump to BLACK
-	@BLACK
-	D; JGT // If D > 0, then jump to BLACK
-
-	// If keyboard is not pressed, then D = 0 and jump to WHITE
 	@WHITE
 	D; JEQ // If D = 0, then jump to WHITE
+	// If keyboard is pressed, then D > 0, jump to BLACK
+	@BLACK
+	0; JMP
 
 (BLACK)
-	@R1
-	M=-1 // Turn row into black
-	@FILL
+	@SCREEN  // Load D with SCREEN's first address
+	D=A
+
+	@0
+	A=D+M // A = 16384 + Memory = New Address. Adds SCREEN's first address to the count in order to color the current pixel black
+	M=-1 // Color pixel black
+
+	@LOOP
 	0; JMP
 
 (WHITE)
-	@R1
-	M=1 // Turn row into white
-	@FILL
-	0; JMP
+	@SCREEN // Load D with SCREEN's first address
+	D=A
 
-(FILL)
-	// Load 0 or 1 from R1 into D
-	@R1
-	D=M
+	@0
+	A=D+M // A = 16384 + Memory = New Address. Adds SCREEN's first address to the count in order to color the current pixel white
+	M=0 // Color pixel white
 
-	// Load the address of the screen into A
-	// Set memory address of the screen to black or white
-	@R0
-	A=M
-	M=D
-
-	@R0 // Increment to next pixel
-	D=M+1
-	M=M+1
-
-	// We access keyboard because it is the last memory address in the screen and subtract it from D
-	@KBD // If keyboard is pressed, then D > 0, jump to BLACK
-	D=A-D
-
-	// Increment R0 to next pixel
-	@R0
-	A=M
-
-	@FILL
-	D; JGT // IF A=0 EXIT AS THE WHOLE SCREEN HAS BEEN FILLED
 	@LOOP
 	0; JMP
