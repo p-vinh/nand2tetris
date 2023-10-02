@@ -27,6 +27,9 @@ CHIP Memory {
     IN in[16], load, address[15];
     OUT out[16];
 
+    // 0000 - 1111 RAM
+    // 0100 - 0101 Screen
+    // 0110 - Keyboard
     PARTS:
     // 00 RAM IN 11 RAM OUT 01 SCREEN 10 KEYBOARD
         DMux4Way(in=load, sel=address[13..14], a=loadram1, b=loadram2, c=scrn, d=kbd);
