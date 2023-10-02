@@ -13,6 +13,7 @@
  * location specified by address. If load==1, the in value is loaded 
  * into the memory location specified by address. This value becomes 
  * available through the out output from the next time step onward.
+
  * Address space rules:
  * Only the upper 16K+8K+1 words of the Memory chip are used. 
  * Access to address>0x6000 is invalid. Access to any address in 
@@ -27,5 +28,13 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-    // Put your code here:
+    // 00 RAM IN 11 RAM OUT 01 SCREEN 10 KEYBOARD
+        DMux4Way(in=load, sel=address[13..14], a=loadram1, b=loadram2, c=scrn, d=kbd);
+        Or(a=loadram1, b=loadram2, out=loadram);
+    RAM16K(in=in, load=loadram, address=address[0..13], out=RAM16Kout);
+    Screen(in=in, load=scrn, address=address[0..12], out=Screenout);
+    Keyboard(out=kbdOut);
+    
+    Mux4Way16(a=RAM16Kout, b=RAM16Kout, c=Screenout, d=kbdOut, sel=address[13..14], out=out);
+
 }
