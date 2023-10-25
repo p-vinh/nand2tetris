@@ -21,6 +21,11 @@ public class CodeWriter {
             e.printStackTrace();
         }
     }
+
+    public void setFileName(String fileName) {
+        
+    }
+
     
     public void writeArithmetic(String command) {
         

@@ -33,7 +33,7 @@ public class Parser {
 
     /* Reads the next command from the input and makes it the current command. */
     public void advance() {
-        currLine = scanner.nextLine();
+        currLine = scanner.nextLine().replaceAll("\\s+|//.*", ""); // Remove comments
     }
 
     /*
@@ -52,9 +52,21 @@ public class Parser {
             currCommandType = CommandType.C_POP;
         } else if (arithLogic.matcher(currLine).matches()) {
             currCommandType = CommandType.C_ARITHMETIC;
+        } else if (currLine.startsWith("label")) {
+            currCommandType = CommandType.C_LABEL;
+        } else if (currLine.startsWith("goto")) {
+            currCommandType = CommandType.C_GOTO;
+        } else if (currLine.startsWith("if-goto")) {
+            currCommandType = CommandType.C_IF;
+        } else if (currLine.startsWith("function")) {
+            currCommandType = CommandType.C_FUNCTION;
+        } else if (currLine.startsWith("call")) {
+            currCommandType = CommandType.C_CALL;
         } else if (currLine.startsWith("return")) {
             currCommandType = CommandType.C_RETURN;
-        } // Implement the rest of the commands C_IF, C_GOTO, C_LABEL, C_FUNCTION, C_CALL
+        } else {
+            throw new IllegalArgumentException("Invalid command");
+        }
         return currCommandType;
     }
 

@@ -1,11 +1,11 @@
 import java.io.File;
 
-public class Main {
+public class VMTranslator {
     private File file;
     private Parser parser;
     private CodeWriter codeWriter;
 
-    public Main(File file) {
+    public VMTranslator(File file) {
         String fileName = file.getName().split(".vm")[0];
         this.file = file;
         this.parser = new Parser(file);
@@ -21,7 +21,7 @@ public class Main {
         }
     }
     public static void main(String[] args) {
-        Main main = new Main(new File(args[0]));
+        VMTranslator main = new VMTranslator(new File(args[0]));
         main.generateAssemblyFile();
         
     }
