@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class Parser {
+public class ParserA {
 
 
     private Scanner scanner;
@@ -24,7 +24,7 @@ public class Parser {
      * In addition, removes all white space and comments.
      * @param fileName the name of the file to read from
      */
-    public Parser(File fileName) {
+    public ParserA(File fileName) {
         try {
             scanner = new Scanner(fileName);
         } catch (FileNotFoundException e) {

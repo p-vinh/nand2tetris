@@ -7,13 +7,13 @@ import java.io.PrintWriter;
 public class HackAssembler {
 
     private File file;
-    private Parser parser;
+    private ParserA parser;
     private Code code;
     private SymbolTable symbolTable;
 
     public HackAssembler(File file) {
         this.file = file;
-        this.parser = new Parser(file);
+        this.parser = new ParserA(file);
         this.code = new Code();
         this.symbolTable = new SymbolTable();
     }
@@ -28,16 +28,16 @@ public class HackAssembler {
             // First pass
             while (parser.hasMoreCommands()) {
                 parser.advance();
-                if (parser.commandType() == Parser.CommandType.C_COMMAND) {
+                if (parser.commandType() == ParserA.CommandType.C_COMMAND) {
                     romAddress++;
-                } else if (parser.commandType() == Parser.CommandType.A_COMMAND) {
+                } else if (parser.commandType() == ParserA.CommandType.A_COMMAND) {
                     romAddress++;
-                } else if (parser.commandType() == Parser.CommandType.L_COMMAND) {
+                } else if (parser.commandType() == ParserA.CommandType.L_COMMAND) {
                     symbolTable.addEntry(parser.symbol(), romAddress);
                 }
             }
 
-            this.parser = new Parser(file); // Go back to the beginning of the file
+            this.parser = new ParserA(file); // Go back to the beginning of the file
 
             // Second pass
             int ramAddress = 16;
@@ -45,7 +45,7 @@ public class HackAssembler {
             while (parser.hasMoreCommands()) {
                 parser.advance();
                 StringBuilder command = new StringBuilder();
-                if (parser.commandType() == Parser.CommandType.A_COMMAND) {
+                if (parser.commandType() == ParserA.CommandType.A_COMMAND) {
                     String symbol = parser.symbol();
                     // @Xxx where Xxx is a symbol
                     if (!symbol.matches("[0-9]+")) {
@@ -58,7 +58,7 @@ public class HackAssembler {
                             writer.println(constructBinaryPadding(symbolTable.GetAddress(symbol)));
                     } else if (symbol.matches("[0-9]+"))// @Xxx where Xxx is a number                        
                         writer.println(constructBinaryPadding(Integer.parseInt(symbol)));
-                } else if (parser.commandType() == Parser.CommandType.C_COMMAND) {
+                } else if (parser.commandType() == ParserA.CommandType.C_COMMAND) {
                     command.append("111");
                     String comp = parser.comp();
                     String dest = parser.dest();
