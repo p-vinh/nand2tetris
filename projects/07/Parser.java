@@ -33,7 +33,13 @@ public class Parser {
 
     /* Reads the next command from the input and makes it the current command. */
     public void advance() {
-        currLine = scanner.nextLine().replaceAll("\\s+|//.*", ""); // Remove comments
+        if (hasMoreCommands()) {
+            currLine = scanner.nextLine().replaceAll("\\s+|//.*", ""); // Remove comments
+
+            if (currLine.isEmpty()) {
+                advance();
+            }
+        }
     }
 
     /*
@@ -44,28 +50,39 @@ public class Parser {
      */
     public CommandType commandType() {
         Pattern arithLogic = Pattern.compile("add|sub|neg|eq|gt|lt|and|or|not");
-
+        String command = currLine.split(" ")[0];
         
-        if (currLine.startsWith("push")) {
-            currCommandType = CommandType.C_PUSH;
-        } else if (currLine.startsWith("pop")) {
-            currCommandType = CommandType.C_POP;
-        } else if (arithLogic.matcher(currLine).matches()) {
-            currCommandType = CommandType.C_ARITHMETIC;
-        } else if (currLine.startsWith("label")) {
-            currCommandType = CommandType.C_LABEL;
-        } else if (currLine.startsWith("goto")) {
-            currCommandType = CommandType.C_GOTO;
-        } else if (currLine.startsWith("if-goto")) {
-            currCommandType = CommandType.C_IF;
-        } else if (currLine.startsWith("function")) {
-            currCommandType = CommandType.C_FUNCTION;
-        } else if (currLine.startsWith("call")) {
-            currCommandType = CommandType.C_CALL;
-        } else if (currLine.startsWith("return")) {
-            currCommandType = CommandType.C_RETURN;
-        } else {
-            throw new IllegalArgumentException("Invalid command");
+        switch (command) {
+            case "push":
+                currCommandType = CommandType.C_PUSH;
+                break;
+            case "pop":
+                currCommandType = CommandType.C_POP;
+                break;
+            case "label":
+                currCommandType = CommandType.C_LABEL;
+                break;
+            case "goto":
+                currCommandType = CommandType.C_GOTO;
+                break;
+            case "if-goto":
+                currCommandType = CommandType.C_IF;
+                break;
+            case "function":
+                currCommandType = CommandType.C_FUNCTION;
+                break;
+            case "call":
+                currCommandType = CommandType.C_CALL;
+                break;
+            case "return":
+                currCommandType = CommandType.C_RETURN;
+                break;
+            default:
+                if (arithLogic.matcher(command).matches()) {
+                    currCommandType = CommandType.C_ARITHMETIC;
+                } else {
+                    throw new IllegalArgumentException("Invalid command");
+                }
         }
         return currCommandType;
     }

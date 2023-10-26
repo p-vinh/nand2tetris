@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Scanner;
 
 public class VMTranslator {
     private File file;
@@ -6,23 +8,56 @@ public class VMTranslator {
     private CodeWriter codeWriter;
 
     public VMTranslator(File file) {
-        String fileName = file.getName().split(".vm")[0];
         this.file = file;
         this.parser = new Parser(file);
-        this.codeWriter = new CodeWriter(fileName);
+        this.codeWriter = new CodeWriter(file);
     }
 
     public void generateAssemblyFile() {
+        if (file.isDirectory()) {
+            iterateFiles(file.listFiles());
+        } else {
+            translate(file);
+        }
+        codeWriter.close();
+    }
+
+    private void translate(File file) {
+        File outputFile = new File(file.getName().split(".vm")[0] + ".asm");
+
+        codeWriter.setFileName(outputFile.getName());
 
         while (parser.hasMoreCommands()) {
             parser.advance();
-
-            
+            switch (parser.commandType()) {
+                case C_PUSH:
+                case C_POP:
+                    codeWriter.writePushPop(parser.commandType(), parser.arg1(), parser.arg2());
+                    break;
+                case C_ARITHMETIC:
+                    codeWriter.writeArithmetic(parser.arg1());
+                    break;
+                default:
+                    break;
+            }
         }
     }
+
+    private void iterateFiles(File[] files) {
+        for (File file : files) {
+            if (file.isDirectory()) {
+                iterateFiles(file.listFiles()); // Calls same method again.
+            } else {
+                if (file.getName().endsWith(".vm")) {
+                    translate(file);
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        VMTranslator main = new VMTranslator(new File(args[0]));
-        main.generateAssemblyFile();
-        
+        File inputFile = new File(args[0]);
+        VMTranslator vmTranslator = new VMTranslator(inputFile);
+        vmTranslator.generateAssemblyFile();
     }
 }
