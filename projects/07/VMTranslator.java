@@ -23,9 +23,7 @@ public class VMTranslator {
     }
 
     private void translate(File file) {
-        File outputFile = new File(file.getName().split(".vm")[0] + ".asm");
 
-        codeWriter.setFileName(outputFile.getName());
 
         while (parser.hasMoreCommands()) {
             parser.advance();
@@ -56,7 +54,7 @@ public class VMTranslator {
     }
 
     public static void main(String[] args) {
-        File inputFile = new File(args[0]);
+        File inputFile = new File("projects\\07\\StackArithmetic\\StackTest\\StackTest.vm");
         VMTranslator vmTranslator = new VMTranslator(inputFile);
         vmTranslator.generateAssemblyFile();
     }
