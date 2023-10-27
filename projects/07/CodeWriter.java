@@ -57,22 +57,29 @@ public class CodeWriter {
                     writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "and":
+                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "or":
+                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "not":
+                    writer.println("@SP\nA=M-1\nM=!M");
                     break;
                 case "eq":
+                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "gt":
+                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "lt":
+                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
                     break;
                 case "neg":
                     writer.println("@SP\nA=M-1\nM=-M");
                     break;
+                default:
+                    break;
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
