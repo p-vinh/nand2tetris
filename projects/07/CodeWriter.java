@@ -119,6 +119,12 @@ public class CodeWriter {
                 } else {
                     writer.println(segmentMap.get(segment));
                 }
+
+                writer.println("@SP");
+                writer.println("A=M");
+                writer.println("D=M"); // Set D to value of SP
+                writer.println("@SP");
+                writer.println("M=M-1"); // Decrement SP pointer by 1 (Popping value off stack)
             }
         } catch (Exception e) {
             e.printStackTrace();
