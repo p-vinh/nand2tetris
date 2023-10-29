@@ -14,11 +14,7 @@ public class VMTranslator {
     }
 
     public void generateAssemblyFile() {
-        if (file.isDirectory()) {
-            iterateFiles(file.listFiles());
-        } else {
-            translate(file);
-        }
+        translate(file);
         codeWriter.close();
     }
 

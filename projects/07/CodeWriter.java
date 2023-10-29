@@ -67,15 +67,15 @@ public class CodeWriter {
                     writer.println("@SP\nA=M-1\nM=!M");
                     break;
                 case "eq":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
                     mJumpNumber++;
                     break;
                 case "gt":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
                     mJumpNumber++;
                     break;
                 case "lt":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
                     mJumpNumber++;
                     break;
                 case "neg":
@@ -146,21 +146,27 @@ public class CodeWriter {
 
     public StringBuilder getArithFormat2(String strJump) {
         StringBuilder sb = new StringBuilder();
-        sb.append("D=M-D\n"); // Set D to first value - second value
-        sb.append("@FALSE"); // FALSE label
-        sb.append(mJumpNumber); // Jump to false if D is false
-        sb.append("\n");
-        sb.append("D;"); // Jump to false if D is false
-        sb.append(strJump); // Jump command
+        sb.append(formatArithLogic());
+        sb.append("M=M-D\n"); // Set M to first value - second value
+        sb.append("@SP\n");
+        sb.append("A=M-1\n");
+        sb.append("D=M\n"); // Set D to value of second value
+
+        sb.append("@FALSE" + mJumpNumber + "\n");
+        sb.append(strJump); // Jump command from map
         sb.append("\n@SP\n"); // Get address of SP
         sb.append("A=M-1\n"); // Decrement A by 1 (Get address of second value)
-        sb.append("M=-1\n"); // Set second value to -1
-        sb.append("@CONTINUE"); // CONTINUE label
-        sb.append(mJumpNumber); // Jump to jump address
-        sb.append("\n0;JMP\n");
-        sb.append("(FALSE");
-        sb.append(mJumpNumber);
-        sb.append(")\n");
+        sb.append("M=-1\n"); // Set second value to -1 (true)
+        
+
+        sb.append("@TRUE" + mJumpNumber + "\n");
+        sb.append("0;JMP\n"); // Jump to TRUE
+        sb.append("(FALSE" + mJumpNumber + ")\n");
+        sb.append("@SP\n");
+        sb.append("A=M-1\n"); // Decrement A by 1 (Get address of second value)
+        sb.append("M=0\n"); // Set second value to 0 (false)
+
+        sb.append("(TRUE" + mJumpNumber + ")");
         return sb;
 
     }
