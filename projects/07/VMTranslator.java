@@ -37,20 +37,9 @@ public class VMTranslator {
         }
     }
 
-    private void iterateFiles(File[] files) {
-        for (File file : files) {
-            if (file.isDirectory()) {
-                iterateFiles(file.listFiles()); // Calls same method again.
-            } else {
-                if (file.getName().endsWith(".vm")) {
-                    translate(file);
-                }
-            }
-        }
-    }
 
     public static void main(String[] args) {
-        File inputFile = new File("projects\\07\\StackArithmetic\\StackTest\\StackTest.vm");
+        File inputFile = new File("projects\\07\\MemoryAccess\\StaticTest\\StaticTest.vm");
         VMTranslator vmTranslator = new VMTranslator(inputFile);
         vmTranslator.generateAssemblyFile();
     }

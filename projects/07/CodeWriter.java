@@ -8,11 +8,9 @@ import java.util.HashMap;
 
 public class CodeWriter {
     private PrintWriter writer;
-    private int labelCounter = 0;
     private int mJumpNumber = 0;
     private String file;
     private Map<String, String> segmentMap = new HashMap<String, String>();
-    private Map<String, String> arithmeticMap = new HashMap<String, String>();
 
     public CodeWriter(File file) {
         try {
@@ -23,63 +21,54 @@ public class CodeWriter {
             e.printStackTrace();
         }
 
-        segmentMap.put("local", "@LCL");
-        segmentMap.put("argument", "@ARG");
-        segmentMap.put("this", "@THIS");
-        segmentMap.put("that", "@THAT");
-        segmentMap.put("pointer", "@3");
-        segmentMap.put("temp", "@5");
-        segmentMap.put("static", "@16");
-        segmentMap.put("constant", "@");
+        segmentMap.put("local", "LCL");
+        segmentMap.put("argument", "ARG");
+        segmentMap.put("this", "THIS");
+        segmentMap.put("that", "THAT");
 
         // Arithmetic
-        arithmeticMap.put("add", "M=M+D");
-        arithmeticMap.put("sub", "M=M-D");
-        arithmeticMap.put("neg", "M=-M");
-        arithmeticMap.put("eq", "D;JEQ");
-        arithmeticMap.put("gt", "D;JGT");
-        arithmeticMap.put("lt", "D;JLT");
-        arithmeticMap.put("and", "M=D&M");
-        arithmeticMap.put("or", "M=D|M");
-        arithmeticMap.put("not", "M=!M");
+        segmentMap.put("add", "M=M+D");
+        segmentMap.put("sub", "M=M-D");
+        segmentMap.put("and", "M=D&M");
+        segmentMap.put("or", "M=D|M");
     }
 
     public void setFileName(String fileName) {
-        file = fileName;
+        this.file = fileName;
     }
 
     public void writeArithmetic(String command) {
         try {
-            switch(command) {
+            switch (command) {
                 case "add":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(segmentMap.get(command)).toString());
                     break;
                 case "sub":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(segmentMap.get(command)).toString());
                     break;
                 case "and":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(segmentMap.get(command)).toString());
                     break;
                 case "or":
-                    writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    writer.println(formatArithLogic().append(segmentMap.get(command)).toString());
                     break;
                 case "not":
                     writer.println("@SP\nA=M-1\nM=!M");
                     break;
                 case "eq":
-                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
+                    writer.println(formatArithLogic().append(formatArithLogic2("JNE")).toString());
                     mJumpNumber++;
                     break;
                 case "gt":
-                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
+                    writer.println(formatArithLogic().append(formatArithLogic2("JLE")).toString());
                     mJumpNumber++;
                     break;
                 case "lt":
-                    writer.println(formatArithLogic().append(getArithFormat2(arithmeticMap.get(command))).toString());
+                    writer.println(formatArithLogic().append(formatArithLogic2("JGE")).toString());
                     mJumpNumber++;
                     break;
                 case "neg":
-                    writer.println("@SP\nA=M-1\nM=-M");
+                    writer.println("D=0\n@SP\nA=M-1\nM=D-M\n");
                     break;
                 default:
                     break;
@@ -92,43 +81,59 @@ public class CodeWriter {
     public void writePushPop(Parser.CommandType commandType, String segment, int index) {
         try {
             if (commandType == Parser.CommandType.C_PUSH) {
-                if (segment.equals("constant")) {
-                    writer.println(segmentMap.get(segment) + index);
-                    writer.println("D=A");
-                } else if (segment.equals("static")) {
-                    writer.println(segmentMap.get(segment) + "." + index);
-                    writer.println("D=M");
-                } else {
-                    writer.println(segmentMap.get(segment));
-                    writer.println("D=M");
-                    writer.println("@" + index);
-                    writer.println("A=D+A");
-                    writer.println("D=M");
-                }
-                // Push D onto stack
-                writer.println("@SP");
-                writer.println("A=M"); // Get address of SP
-                writer.println("M=D"); // Set value of D to address of SP
-                // Increment SP pointer by 1
-                writer.println("@SP");
-                writer.println("M=M+1");
-            } else if (commandType == Parser.CommandType.C_POP) {
-                if (segment.equals("static")) {
-                    writer.println("@SP");
-                    writer.println("M=M-1");
-                    writer.println("A=M");
-                    writer.println("D=M");
-                    writer.println(segmentMap.get(segment) + "." + index);
-                    writer.println("M=D");
-                } else {
-                    writer.println(segmentMap.get(segment));
+                switch (segment) {
+                    case "constant":
+                        writer.println("@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
+                        break;
+                    case "static":
+                        writer.println(formatPush2(String.valueOf(16 + index)).toString());
+                        break;
+                    case "pointer":
+                        if (index == 0)
+                            writer.println(formatPush2("THIS").toString());
+                        else if (index == 1)
+                            writer.println(formatPush2("THAT").toString());
+                        break;
+                    case "temp":
+                        writer.println(formatPush("R5", index + 5).toString());
+                        break;
+                    case "local":
+                    case "argument":
+                    case "this":
+                    case "that":
+                        writer.println(formatPush(segmentMap.get(segment), index).toString());
+                        break;
+                    default:
+                        new Exception("Invalid segment type");
+                        break;
                 }
 
-                writer.println("@SP");
-                writer.println("A=M");
-                writer.println("D=M"); // Set D to value of SP
-                writer.println("@SP");
-                writer.println("M=M-1"); // Decrement SP pointer by 1 (Popping value off stack)
+            } else if (commandType == Parser.CommandType.C_POP) {
+                switch (segment) {
+                    case "constant":
+                        writer.println("@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
+                        break;
+                    case "static":
+                        writer.println(formatPop2(String.valueOf(16 + index)).toString());
+                        break;
+                    case "pointer":
+                        if (index == 0)
+                            writer.println(formatPop2("THIS").toString());
+                        else if (index == 1)
+                            writer.println(formatPop2("THAT").toString());
+                        break;
+                    case "temp":
+                        writer.println(formatPop("R5", index + 5).toString());
+                        break;
+                    case "local":
+                    case "argument":
+                    case "this":
+                    case "that":
+                        writer.println(formatPop(segmentMap.get(segment), index).toString());
+                        break;
+                    default:
+                        break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,34 +148,89 @@ public class CodeWriter {
         sb.append("A=A-1\n"); // Decrement A by 1 (Get address of second value)
         return sb;
     }
-
-    public StringBuilder getArithFormat2(String strJump) {
+    private StringBuilder formatArithLogic2(String strJump) {
         StringBuilder sb = new StringBuilder();
-        sb.append(formatArithLogic());
-        sb.append("M=M-D\n"); // Set M to first value - second value
+        sb.append("D=M-D\n");
+        sb.append("@FALSE" + mJumpNumber + "\n");
+        sb.append("D;" + strJump + "\n");
         sb.append("@SP\n");
         sb.append("A=M-1\n");
-        sb.append("D=M\n"); // Set D to value of second value
-
-        sb.append("@FALSE" + mJumpNumber + "\n");
-        sb.append(strJump); // Jump command from map
-        sb.append("\n@SP\n"); // Get address of SP
-        sb.append("A=M-1\n"); // Decrement A by 1 (Get address of second value)
-        sb.append("M=-1\n"); // Set second value to -1 (true)
-        
-
-        sb.append("@TRUE" + mJumpNumber + "\n");
-        sb.append("0;JMP\n"); // Jump to TRUE
+        sb.append("M=-1\n");
+        sb.append("@CONTINUE" + mJumpNumber + "\n");
+        sb.append("0;JMP\n");
         sb.append("(FALSE" + mJumpNumber + ")\n");
         sb.append("@SP\n");
-        sb.append("A=M-1\n"); // Decrement A by 1 (Get address of second value)
-        sb.append("M=0\n"); // Set second value to 0 (false)
-
-        sb.append("(TRUE" + mJumpNumber + ")");
+        sb.append("A=M-1\n");
+        sb.append("M=0\n");
+        sb.append("(CONTINUE" + mJumpNumber + ")");
         return sb;
 
     }
-    
+
+    private StringBuilder formatPush(String strSegment, int index) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("@" + strSegment + "\n");
+        sb.append("D=M\n");
+        sb.append("@" + index + "\n");
+        sb.append("A=D+A\n");
+        sb.append("D=M\n");
+        sb.append("@SP\n");
+        sb.append("A=M\n");
+        sb.append("M=D\n");
+        sb.append("@SP\n");
+        sb.append("M=M+1\n");
+        return sb;
+
+    }
+
+    private StringBuilder formatPush2(String strSegment) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("@" + strSegment + "\n");
+        sb.append("D=M\n");
+        sb.append("@SP\n");
+        sb.append("A=M\n");
+        sb.append("M=D\n");
+        sb.append("@SP\n");
+        sb.append("M=M+1\n");
+        return sb;
+    }
+
+    private StringBuilder formatPop(String strSegment, int index) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("@" + strSegment + "\n");
+        sb.append("D=M\n");
+        sb.append("@" + index + "\n");
+        sb.append("D=D+A\n");
+        sb.append("@R13\n");
+        sb.append("M=D\n");
+        sb.append("@SP\n");
+        sb.append("AM=M-1\n");
+        sb.append("D=M\n");
+        sb.append("@R13\n");
+        sb.append("A=M\n");
+        sb.append("M=D\n");
+
+        return sb;
+    }
+
+    // get format for popping off of stack given the segment - for static & pointer
+    private StringBuilder formatPop2(String strSegment) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("@" + strSegment + "\n");
+        sb.append("D=A\n");
+        sb.append("@R13\n");
+        sb.append("M=D\n");
+        sb.append("@SP\n");
+        sb.append("AM=M-1\n");
+        sb.append("D=M\n");
+        sb.append("@R13\n");
+        sb.append("A=M\n");
+        sb.append("M=D\n");
+
+        return sb;
+
+    }
+
     // Closes the output file
     public void close() {
         writer.close();
