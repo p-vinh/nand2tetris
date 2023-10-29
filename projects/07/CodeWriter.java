@@ -9,6 +9,7 @@ import java.util.HashMap;
 public class CodeWriter {
     private PrintWriter writer;
     private int labelCounter = 0;
+    private int mJumpNumber = 0;
     private String file;
     private Map<String, String> segmentMap = new HashMap<String, String>();
     private Map<String, String> arithmeticMap = new HashMap<String, String>();
@@ -67,12 +68,15 @@ public class CodeWriter {
                     break;
                 case "eq":
                     writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    mJumpNumber++;
                     break;
                 case "gt":
                     writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    mJumpNumber++;
                     break;
                 case "lt":
                     writer.println(formatArithLogic().append(arithmeticMap.get(command)).toString());
+                    mJumpNumber++;
                     break;
                 case "neg":
                     writer.println("@SP\nA=M-1\nM=-M");
@@ -132,6 +136,27 @@ public class CodeWriter {
         sb.append("D=M\n"); // Set D to value of SP (Get first value)
         sb.append("A=A-1\n"); // Decrement A by 1 (Get address of second value)
         return sb;
+    }
+
+    public StringBuilder getArithFormat2(String strJump) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("D=M-D\n"); // Set D to first value - second value
+        sb.append("@FALSE"); // FALSE label
+        sb.append(mJumpNumber); // Jump to false if D is false
+        sb.append("\n");
+        sb.append("D;"); // Jump to false if D is false
+        sb.append(strJump); // Jump command
+        sb.append("\n@SP\n"); // Get address of SP
+        sb.append("A=M-1\n"); // Decrement A by 1 (Get address of second value)
+        sb.append("M=-1\n"); // Set second value to -1
+        sb.append("@CONTINUE"); // CONTINUE label
+        sb.append(mJumpNumber); // Jump to jump address
+        sb.append("\n0;JMP\n");
+        sb.append("(FALSE");
+        sb.append(mJumpNumber);
+        sb.append(")\n");
+        return sb;
+
     }
     
     // Closes the output file
