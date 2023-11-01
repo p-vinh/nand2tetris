@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.Map;
-
-import projects.Parser.CommandType;
-
 import java.util.HashMap;
 import java.io.IOException;
 
@@ -264,39 +261,32 @@ public class CodeWriter {
         String strLabel = "RETURN_LABEL" + labelNum;
         labelNum++;
         try {
-            writer.println(new StringBuilder().append("@").append(strLabel).append("\n")
-                    .append("D=A\n@SP\nA=M\nM=D\n@SP\nM=M+1\n").append(formatPush2("LCL"))
-                    .append(formatPush2("ARG")).append(formatPush2("THIS")).append(formatPush2("THAT"))
-                    .append("@SP\n").append("D=M\n").append("@5\n").append("D=D-A\n").append("@").append(nNumArgs)
-                    .append("\n").append("D=D-A\n").append("@ARG\n").append("M=D\n").append("@SP\n").append("D=M\n")
-                    .append("@LCL\n").append("M=D\n").append("@").append(strFunctionName).append("\n0;JMP\n(")
-                    .append(strLabel).append(")\n").toString());
-            // writer.println("@" + strLabel);
-            // writer.println("D=A");
-            // writer.println("@SP");
-            // writer.println("A=M");
-            // writer.println("M=D");
-            // writer.println("@SP");
-            // writer.println("M=M+1");
-            // writer.println(formatPush2("LCL").toString());
-            // writer.println(formatPush2("ARG").toString());
-            // writer.println(formatPush2("THIS").toString());
-            // writer.println(formatPush2("THAT").toString());
-            // writer.println("@SP");
-            // writer.println("D=M");
-            // writer.println("@5");
-            // writer.println("D=D-A");
-            // writer.println("@" + nNumArgs);
-            // writer.println("D=D-A");
-            // writer.println("@ARG");
-            // writer.println("M=D");
-            // writer.println("@SP");
-            // writer.println("D=M");
-            // writer.println("@LCL");
-            // writer.println("M=D");
-            // writer.println("@" + strFunctionName);
-            // writer.println("0;JMP");
-            // writer.println("(" + strLabel + ")");
+            writer.println("@" + strLabel);
+            writer.println("D=A");
+            writer.println("@SP");
+            writer.println("A=M");
+            writer.println("M=D");
+            writer.println("@SP");
+            writer.println("M=M+1");
+            writer.println(formatPush2("LCL").toString());
+            writer.println(formatPush2("ARG").toString());
+            writer.println(formatPush2("THIS").toString());
+            writer.println(formatPush2("THAT").toString());
+            writer.println("@SP");
+            writer.println("D=M");
+            writer.println("@5");
+            writer.println("D=D-A");
+            writer.println("@" + nNumArgs);
+            writer.println("D=D-A");
+            writer.println("@ARG");
+            writer.println("M=D");
+            writer.println("@SP");
+            writer.println("D=M");
+            writer.println("@LCL");
+            writer.println("M=D");
+            writer.println("@" + strFunctionName);
+            writer.println("0;JMP");
+            writer.println("(" + strLabel + ")");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -322,57 +312,47 @@ public class CodeWriter {
 
     public void writeReturn() {
         try {
-            writer.println(new StringBuilder().append("@LCL\n").append("D=M\n").append("@FRAME\n").append("M=D\n")
-                    .append("@5\n").append("A=D-A\n").append("D=M\n").append("@RET\n").append("M=D\n")
-                    .append(formatPop("ARG", 0)).append("@ARG\n").append("D=M\n").append("@SP\n").append("M=D+1\n")
-                    .append("@FRAME\n").append("D=M-1\n").append("AM=D\n").append("D=M\n").append("@THAT\n")
-                    .append("M=D\n").append("@FRAME\n").append("D=M-1\n").append("AM=D\n").append("D=M\n")
-                    .append("@THIS\n").append("M=D\n").append("@FRAME\n").append("D=M-1\n").append("AM=D\n")
-                    .append("D=M\n").append("@ARG\n").append("M=D\n").append("@FRAME\n").append("D=M-1\n")
-                    .append("AM=D\n").append("D=M\n").append("@LCL\n").append("M=D\n").append("@RET\n").append("A=M\n")
-                    .append("0;JMP\n").toString());
-
-            // writer.println("@LCL"); // LCL address
-            // writer.println("D=M"); // D = contents of LCL
-            // writer.println("@FRAME");
-            // writer.println("M=D"); // FRAME = contents of LCL
-            // writer.println("@5"); // temp variable
-            // writer.println("A=D-A");
-            // writer.println("D=M");
-            // writer.println("@RET");
-            // writer.println("M=D");
-            // writer.println(formatPop("ARG", 0).toString());
-            // writer.println("@ARG"); // ARG address
-            // writer.println("D=M"); // contents of ARG
-            // writer.println("@SP");
-            // writer.println("M=D+1");
-            // writer.println("@FRAME");
-            // writer.println("D=M-1");
-            // writer.println("AM=D");
-            // writer.println("D=M");
-            // writer.println("@THAT");
-            // writer.println("M=D");
-            // writer.println("@FRAME");
-            // writer.println("D=M-1");
-            // writer.println("AM=D");
-            // writer.println("D=M");
-            // writer.println("@THIS");
-            // writer.println("M=D");
-            // writer.println("@FRAME");
-            // writer.println("D=M-1");
-            // writer.println("AM=D");
-            // writer.println("D=M");
-            // writer.println("@ARG");
-            // writer.println("M=D");
-            // writer.println("@FRAME");
-            // writer.println("D=M-1");
-            // writer.println("AM=D");
-            // writer.println("D=M");
-            // writer.println("@LCL");
-            // writer.println("M=D");
-            // writer.println("@RET");
-            // writer.println("A=M");
-            // writer.println("0;JMP");
+            writer.println("@LCL"); // LCL address
+            writer.println("D=M"); // D = contents of LCL
+            writer.println("@FRAME");
+            writer.println("M=D"); // FRAME = contents of LCL
+            writer.println("@5"); // temp variable
+            writer.println("A=D-A");
+            writer.println("D=M");
+            writer.println("@RET");
+            writer.println("M=D");
+            writer.println(formatPop("ARG", 0).toString());
+            writer.println("@ARG"); // ARG address
+            writer.println("D=M"); // contents of ARG
+            writer.println("@SP");
+            writer.println("M=D+1");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@THAT");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@THIS");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@ARG");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@LCL");
+            writer.println("M=D");
+            writer.println("@RET");
+            writer.println("A=M");
+            writer.println("0;JMP");
         } catch (Exception e) {
             e.printStackTrace();
         }
