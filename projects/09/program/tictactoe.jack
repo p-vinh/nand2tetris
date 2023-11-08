@@ -1,0 +1,148 @@
+
+
+class tictactoe {
+    
+    field Array board;
+    field Array players;
+
+    constructor tictactoe new() {
+        let board = Array.new(9);
+        do createBoard();
+        do createPlayers();
+
+        return this;
+    }
+
+    method void createBoard() {
+        var int i;
+        let i = 0;
+        while (~i < 9) {
+            let board[i] = 0;
+            let i = i + 1;
+        }
+        return;
+    }
+
+    method Array createPlayers() {
+        let players = Array.new(2);
+        let players[0] = 1;
+        let players[1] = 2;
+        return players;
+    }
+
+    method void drawBoard() {
+        do Screen.clearScreen();
+        do Screen.printString("Tic Tac Toe", 0, 0);
+        do Screen.printString("Player 1: X", 0, 1);
+        do Screen.printString("Player 2: O", 0, 2);
+
+        return;
+    }
+
+    method void startGame() {
+        var char key;
+        var boolean exit;
+        let exit = false;
+
+        do Screen.clearScreen();
+        do Screen.printString("Tic Tac Toe", 0, 0);
+        do Screen.printString("Player 1: X", 0, 1);
+        do Screen.printString("Player 2: O", 0, 2);
+        do Screen.printString("Press any key to start", 0, 3);
+        do Screen.printString("Press ESC to quit", 0, 4);
+
+        while (~exit) {
+            while (key = 0) {
+                let key = Keyboard.keyPressed();
+            }
+
+            if (key = 81)  { let exit = true; }
+            else { do playGame();}
+        }
+        return;
+    }
+
+    method void playGame() {
+        var char key;
+        var int player, location;
+
+        do Screen.clearScreen();
+        let player = getPlayerTurn();
+
+        if (player = 1) {
+            do Screen.printString("Player 1's turn", 0, 0);
+        } else {
+            do Screen.printString("Player 2's turn", 0, 0);
+        }
+
+        do Screen.printString("Choose a number between 1-9", 0, 1);
+        do Screen.printString("Press ESC to quit", 0, 2);
+
+        let key = Keyboard.keyPressed();
+        if (key = 140) {
+            do dispose();
+            return;
+        } 
+        if (key > 48 & key < 58) {
+            // Convert key number to a location on the board
+            // let location = key - 49;
+            // do updateBoard(location);
+            return;
+        }
+
+        return;
+    }
+
+    method void updateBoard(int location) {
+        var int player;
+        var Circle circle;
+        var X x;
+
+        let player = getPlayerTurn();
+
+        let board[location] = player;
+        if (player = 1) {
+            let x = X.new(0, 1); // temp
+            do x.drawX(location);
+        } else {
+            let circle = Circle.new(0, 0); // temp
+            do circle.drawCircle(location);
+        }
+        return;
+    }
+
+    method int getPlayerTurn() {
+        var int sumOfX, sumOfO, i, player;
+
+        let sumOfX = 0;
+        let sumOfO = 0;
+
+        let i = 0;
+        while (i < 9) {
+            if (board[i] = 1) {
+                let sumOfX = sumOfX + 1;
+            } 
+            if (board[i] = 2) {
+                let sumOfO = sumOfO + 1;
+            }
+            let i = i + 1;
+        }
+
+        let player = 0;
+
+        if (sumOfX > sumOfO) {
+            let player = 2;
+        } else {
+            let player = 1;
+        }
+        
+        return player;
+    }
+
+
+    method void dispose() {
+        do Memory.dealloc(this);
+        return;
+    }
+
+}
