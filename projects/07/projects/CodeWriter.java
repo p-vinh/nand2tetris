@@ -1,22 +1,24 @@
+package projects;
+
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.HashMap;
+import java.io.IOException;
 
 public class CodeWriter {
     private PrintWriter writer;
     private int mJumpNumber = 0;
-    private String file;
+    private int labelNum = 0;
+    private static String fileName = "";
     private Map<String, String> segmentMap = new HashMap<String, String>();
 
-    public CodeWriter(File file) {
+    public CodeWriter(File fileName) {
         try {
-            File outputFile = new File(file.getAbsolutePath().split(".vm")[0] + ".asm");
-            writer = new PrintWriter(new FileWriter(outputFile));
-            this.file = file.getName();
+            writer = new PrintWriter(new FileWriter(fileName));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -33,8 +35,9 @@ public class CodeWriter {
         segmentMap.put("or", "M=D|M");
     }
 
-    public void setFileName(String fileName) {
-        this.file = fileName;
+    public void setFileName(File file) {
+        fileName = file.getName();
+
     }
 
     public void writeArithmetic(String command) {
@@ -83,10 +86,11 @@ public class CodeWriter {
             if (commandType == Parser.CommandType.C_PUSH) {
                 switch (segment) {
                     case "constant":
-                        writer.println("@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
+                        writer.println(
+                                "@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
                         break;
                     case "static":
-                        writer.println(formatPush2(String.valueOf(16 + index)).toString());
+                        writer.print(new StringBuilder().append("@").append(fileName).append(index).append("\n").append("D=M\n@SP\nA=M\nM=D\n@SP\nM=M+1\n").toString());
                         break;
                     case "pointer":
                         if (index == 0)
@@ -111,10 +115,11 @@ public class CodeWriter {
             } else if (commandType == Parser.CommandType.C_POP) {
                 switch (segment) {
                     case "constant":
-                        writer.println("@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
+                        writer.println(
+                                "@" + index + "\n" + "D=A\n" + "@SP\n" + "A=M\n" + "M=D\n" + "@SP\n" + "M=M+1\n");
                         break;
                     case "static":
-                        writer.println(formatPop2(String.valueOf(16 + index)).toString());
+                        writer.println(new StringBuilder().append("@").append(fileName).append(index).append("\nD=A\n@R13\nM=D\n@SP\nAM=M-1\nD=M\n@R13\nA=M\nM=D\n").toString());
                         break;
                     case "pointer":
                         if (index == 0)
@@ -148,6 +153,7 @@ public class CodeWriter {
         sb.append("A=A-1\n"); // Decrement A by 1 (Get address of second value)
         return sb;
     }
+
     private StringBuilder formatArithLogic2(String strJump) {
         StringBuilder sb = new StringBuilder();
         sb.append("D=M-D\n");
@@ -229,6 +235,138 @@ public class CodeWriter {
 
         return sb;
 
+    }
+
+    public void writeInit() {
+        try {
+            writer.println("@256");
+            writer.println("D=A");
+            writer.println("@SP");
+            writer.println("M=D");
+            writeCall("Sys.init", 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeLabel(String label) {
+        try {
+            writer.println("(" + label + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeCall(String strFunctionName, int nNumArgs) {
+        String strLabel = "RETURN_LABEL" + labelNum;
+        labelNum++;
+        try {
+            writer.println("@" + strLabel);
+            writer.println("D=A");
+            writer.println("@SP");
+            writer.println("A=M");
+            writer.println("M=D");
+            writer.println("@SP");
+            writer.println("M=M+1");
+            writer.println(formatPush2("LCL").toString());
+            writer.println(formatPush2("ARG").toString());
+            writer.println(formatPush2("THIS").toString());
+            writer.println(formatPush2("THAT").toString());
+            writer.println("@SP");
+            writer.println("D=M");
+            writer.println("@5");
+            writer.println("D=D-A");
+            writer.println("@" + nNumArgs);
+            writer.println("D=D-A");
+            writer.println("@ARG");
+            writer.println("M=D");
+            writer.println("@SP");
+            writer.println("D=M");
+            writer.println("@LCL");
+            writer.println("M=D");
+            writer.println("@" + strFunctionName);
+            writer.println("0;JMP");
+            writer.println("(" + strLabel + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void writeGoto(String label) {
+        try {
+            writer.println("@" + label + "\n" + "0;JMP");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeIf(String label) {
+        try {
+            writer.println(formatArithLogic().toString());
+            writer.println("@" + label + "\n" + "D;JNE");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeReturn() {
+        try {
+            writer.println("@LCL"); // LCL address
+            writer.println("D=M"); // D = contents of LCL
+            writer.println("@FRAME");
+            writer.println("M=D"); // FRAME = contents of LCL
+            writer.println("@5"); // temp variable
+            writer.println("A=D-A");
+            writer.println("D=M");
+            writer.println("@RET");
+            writer.println("M=D");
+            writer.println(formatPop("ARG", 0).toString());
+            writer.println("@ARG"); // ARG address
+            writer.println("D=M"); // contents of ARG
+            writer.println("@SP");
+            writer.println("M=D+1");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@THAT");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@THIS");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@ARG");
+            writer.println("M=D");
+            writer.println("@FRAME");
+            writer.println("D=M-1");
+            writer.println("AM=D");
+            writer.println("D=M");
+            writer.println("@LCL");
+            writer.println("M=D");
+            writer.println("@RET");
+            writer.println("A=M");
+            writer.println("0;JMP");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeFunction(String strFunctionName, int locals) {
+        try {
+            writer.println("(" + strFunctionName + ")");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < locals; i++) {
+            writePushPop(Parser.CommandType.C_PUSH, "constant", 0);
+        }
     }
 
     // Closes the output file

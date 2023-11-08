@@ -1,4 +1,4 @@
-
+package projects;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -34,7 +34,7 @@ public class Parser {
     /* Reads the next command from the input and makes it the current command. */
     public void advance() {
         if (hasMoreCommands()) {
-            currLine = scanner.nextLine().replaceAll("//.*", ""); // Remove comments
+            currLine = scanner.nextLine().replaceAll("//.*", "").trim(); // Remove comments
 
             if (currLine.isEmpty()) {
                 advance();
