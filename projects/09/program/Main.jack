@@ -1,12 +1,11 @@
 // Main function for tictactoe
 
 class Main {
-
     function void main() {
-        var tictactoe ttt;
-        let ttt = tictactoe.new();
-        do ttt.drawBoard();
-        do ttt.dispose();
+        do Screen.clearScreen();
+        do TicTacToe.init();
+        do TicTacToe.start();
+
         return;
     }
 }

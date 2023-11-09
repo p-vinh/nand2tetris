@@ -1,148 +1,130 @@
 
 
-class tictactoe {
-    
-    field Array board;
-    field Array players;
+class TicTacToe {
+    static Board board;
+    static Pieces Cross, Circle;
+    static AI ai;
+    static int callCount;
+    static boolean display;
+    static int x1;
 
-    constructor tictactoe new() {
-        let board = Array.new(9);
-        do createBoard();
-        do createPlayers();
+    function int processBoard() {
+        do board.evaluateBoard();
 
-        return this;
-    }
-
-    method void createBoard() {
-        var int i;
-        let i = 0;
-        while (~i < 9) {
-            let board[i] = 0;
-            let i = i + 1;
-        }
-        return;
-    }
-
-    method Array createPlayers() {
-        let players = Array.new(2);
-        let players[0] = 1;
-        let players[1] = 2;
-        return players;
-    }
-
-    method void drawBoard() {
-        do Screen.clearScreen();
-        do Screen.printString("Tic Tac Toe", 0, 0);
-        do Screen.printString("Player 1: X", 0, 1);
-        do Screen.printString("Player 2: O", 0, 2);
-
-        return;
-    }
-
-    method void startGame() {
-        var char key;
-        var boolean exit;
-        let exit = false;
-
-        do Screen.clearScreen();
-        do Screen.printString("Tic Tac Toe", 0, 0);
-        do Screen.printString("Player 1: X", 0, 1);
-        do Screen.printString("Player 2: O", 0, 2);
-        do Screen.printString("Press any key to start", 0, 3);
-        do Screen.printString("Press ESC to quit", 0, 4);
-
-        while (~exit) {
-            while (key = 0) {
-                let key = Keyboard.keyPressed();
-            }
-
-            if (key = 81)  { let exit = true; }
-            else { do playGame();}
-        }
-        return;
-    }
-
-    method void playGame() {
-        var char key;
-        var int player, location;
-
-        do Screen.clearScreen();
-        let player = getPlayerTurn();
-
-        if (player = 1) {
-            do Screen.printString("Player 1's turn", 0, 0);
-        } else {
-            do Screen.printString("Player 2's turn", 0, 0);
+        if (board.isWin()) {
+            do board.drawWin();
+            return 3;
         }
 
-        do Screen.printString("Choose a number between 1-9", 0, 1);
-        do Screen.printString("Press ESC to quit", 0, 2);
-
-        let key = Keyboard.keyPressed();
-        if (key = 140) {
-            do dispose();
-            return;
-        } 
-        if (key > 48 & key < 58) {
-            // Convert key number to a location on the board
-            // let location = key - 49;
-            // do updateBoard(location);
-            return;
+        if (board.isDraw()) {
+            return 2;
         }
 
-        return;
+        return 1;
     }
 
-    method void updateBoard(int location) {
-        var int player;
-        var Circle circle;
-        var X x;
+    function void init() {
+		do Input.init();
+        let board = Board.new(200,60);
+		let Cross = Piece.new(1);
+		let Circle = Piece.new(2);
+        let ai = AI.new(board, Cross, Circle);
+		return;
+	}
 
-        let player = getPlayerTurn();
+    function void start() {
+        var int currentPlayer, currentPiece;
+        var boolean gameOver;
+        var int result;
 
-        let board[location] = player;
-        if (player = 1) {
-            let x = X.new(0, 1); // temp
-            do x.drawX(location);
-        } else {
-            let circle = Circle.new(0, 0); // temp
-            do circle.drawCircle(location);
-        }
-        return;
-    }
-
-    method int getPlayerTurn() {
-        var int sumOfX, sumOfO, i, player;
-
-        let sumOfX = 0;
-        let sumOfO = 0;
-
-        let i = 0;
-        while (i < 9) {
-            if (board[i] = 1) {
-                let sumOfX = sumOfX + 1;
-            } 
-            if (board[i] = 2) {
-                let sumOfO = sumOfO + 1;
-            }
-            let i = i + 1;
-        }
-
-        let player = 0;
-
-        if (sumOfX > sumOfO) {
-            let player = 2;
-        } else {
-            let player = 1;
-        }
-        
-        return player;
-    }
+        while (true) {
+            let currentPlayer = InputUtil.waitForZeroOrOne("'1' TO LET SYSTEM MAKE THE FIRST MOVE || '0' TO MAKE THE FIRST STEP");
+			let currentPiece = Cross;
+            let gameOver = false;
 
 
-    method void dispose() {
-        do Memory.dealloc(this);
-        return;
-    }
+            while (~gameOver) {
+                let result = TicTacToe.play(currentPlayer,currentPiece);
+				
+				if(result = 0) {
+					let gameOver = true;
+				}
 
+				if(result = 1) {
+					let currentPlayer = TicTacToe.getOtherPlayer(currentPlayer);
+					let currentPiece = TicTacToe.getOtherPiece(currentPiece);
+				}
+
+				if(result = 2) {
+					do Input.showMessage("GAME TIE ^___^ || PRESS 'ENTER' TO PROCEED");
+					let gameOver = true;
+				}
+
+				if(result = 3) {
+					if(currentPlayer = 0) {
+						do Input.showMessage("CONGRALUTIONS! YOU WON! || PRESS 'ENTER' TO PROCEED");
+					} else {
+						do Input.showMessage("YOU LOST || PRESS 'ENTER' TO PROCEED");
+					}
+					let gameOver = true;
+				}
+			}
+			do board.dispose();
+		}
+	
+		return;
+	}
+
+    function int play(int player, Piece p) {
+		var boolean validPlayerInput;
+		var int input;
+		var Array playerMove, computerMove;
+		let validPlayerInput = false;
+		
+		if(player=0) {
+			while(~validPlayerInput) { 
+				let input = Input.readInput("ENTER POSITION ( 1 - 9 ) || '0' to RESTART ");
+				if(input=0) {
+					return 0;
+				}
+				let playerMove = TicTacToe.inputToMove(input);
+				let validPlayerInput = board.isFree(playerMove[0],playerMove[1]);
+			}
+			
+			do board.makeMove(playerMove[0], playerMove[1], p);
+			do board.drawMove(playerMove[0], playerMove[1], p);
+			do playerMove.dispose();
+			return TicTacToe.processBoard();
+		} else {
+			// let computerMove = TicTacToe.getComputerMove(p);
+			// do board.makeMove(computerMove[0],computerMove[1],p);
+			// do board.drawMove(computerMove[0],computerMove[1],p);
+			// do computerMove.dispose();
+			return TicTacToe.processBoard();
+		}
+	}
+
+    function int getOtherPiece(Piece p) {
+		if(p = Circle) {
+			return Cross;
+		} else {
+			return Circle;
+		}
+	}
+	
+	function int getOtherPlayer(int p) {
+		if(p = 0) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+    function Array inputToMove(int input) {
+		var Array moves;
+		let moves = Array.new(2);
+		let moves[0] = (input - 1) / 3 ; //row;
+		let moves[1] = (input - 1)-(3 * moves[0]);
+		return moves;
+	}
 }

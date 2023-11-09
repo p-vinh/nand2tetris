@@ -1,544 +1,613 @@
-function tictactoe.new 0
-push constant 2
-call Memory.alloc 1
-pop pointer 0
-push constant 9
-call Array.new 1
-pop this 0
-push pointer 0
-call tictactoe.createBoard 1
+function TicTacToe.processBoard 0
+push static 0
+call Board.evaluateBoard 1
 pop temp 0
-push pointer 0
-call tictactoe.createPlayers 1
+push static 0
+call Board.isWin 1
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push static 0
+call Board.drawWin 1
 pop temp 0
-push pointer 0
+push constant 3
 return
-function tictactoe.createBoard 1
-push argument 0
-pop pointer 0
+label IF_FALSE0
+push static 0
+call Board.isDraw 1
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push constant 2
+return
+label IF_FALSE1
+push constant 1
+return
+function TicTacToe.init 0
+call Input.init 0
+pop temp 0
+push constant 200
+push constant 60
+call Board.new 2
+pop static 0
+push constant 1
+call Piece.new 1
+pop static 1
+push constant 2
+call Piece.new 1
+pop static 2
+push static 0
+push static 1
+push static 2
+call AI.new 3
+pop static 3
 push constant 0
-pop local 0
+return
+function TicTacToe.start 4
 label WHILE_EXP0
-push local 0
+push constant 0
 not
-push constant 9
-lt
 not
 if-goto WHILE_END0
-push local 0
-push this 0
-add
-push constant 0
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push local 0
-push constant 1
-add
+push constant 67
+call String.new 1
+push constant 39
+call String.appendChar 2
+push constant 49
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 76
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 89
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+push constant 75
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 70
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 86
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 48
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+push constant 75
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 72
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 70
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+call InputUtil.waitForZeroOrOne 1
 pop local 0
-goto WHILE_EXP0
-label WHILE_END0
-push constant 0
-return
-function tictactoe.createPlayers 0
-push argument 0
-pop pointer 0
-push constant 2
-call Array.new 1
-pop this 1
-push constant 0
-push this 1
-add
-push constant 1
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push constant 1
-push this 1
-add
-push constant 2
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
-push this 1
-return
-function tictactoe.drawBoard 0
-push argument 0
-pop pointer 0
-call Screen.clearScreen 0
-pop temp 0
-push constant 11
-call String.new 1
-push constant 84
-call String.appendChar 2
-push constant 105
-call String.appendChar 2
-push constant 99
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 84
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 99
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 84
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 0
-push constant 0
-call Screen.printString 3
-pop temp 0
-push constant 11
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 49
-call String.appendChar 2
-push constant 58
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 88
-call String.appendChar 2
-push constant 0
-push constant 1
-call Screen.printString 3
-pop temp 0
-push constant 11
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 50
-call String.appendChar 2
-push constant 58
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 79
-call String.appendChar 2
-push constant 0
-push constant 2
-call Screen.printString 3
-pop temp 0
-push constant 0
-return
-function tictactoe.startGame 2
-push argument 0
-pop pointer 0
-push constant 0
+push static 1
 pop local 1
-call Screen.clearScreen 0
-pop temp 0
-push constant 11
-call String.new 1
-push constant 84
-call String.appendChar 2
-push constant 105
-call String.appendChar 2
-push constant 99
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 84
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 99
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 84
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
 push constant 0
+pop local 2
+label WHILE_EXP1
+push local 2
+not
+not
+if-goto WHILE_END1
+push local 0
+push local 1
+call TicTacToe.play 2
+pop local 3
+push local 3
 push constant 0
-call Screen.printString 3
-pop temp 0
-push constant 11
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 49
-call String.appendChar 2
-push constant 58
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 88
-call String.appendChar 2
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 0
+not
+pop local 2
+label IF_FALSE0
+push local 3
 push constant 1
-call Screen.printString 3
-pop temp 0
-push constant 11
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 50
-call String.appendChar 2
-push constant 58
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 79
-call String.appendChar 2
-push constant 0
+eq
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
+push local 0
+call TicTacToe.getOtherPlayer 1
+pop local 0
+push local 1
+call TicTacToe.getOtherPiece 1
+pop local 1
+label IF_FALSE1
+push local 3
 push constant 2
-call Screen.printString 3
-pop temp 0
-push constant 22
+eq
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 42
 call String.new 1
+push constant 71
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+push constant 77
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 94
+call String.appendChar 2
+push constant 95
+call String.appendChar 2
+push constant 95
+call String.appendChar 2
+push constant 95
+call String.appendChar 2
+push constant 94
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
 push constant 80
 call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 107
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 0
-push constant 3
-call Screen.printString 3
-pop temp 0
-push constant 17
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 32
+push constant 82
 call String.appendChar 2
 push constant 69
 call String.appendChar 2
 push constant 83
 call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
 push constant 67
 call String.appendChar 2
-push constant 32
+push constant 69
 call String.appendChar 2
-push constant 116
+push constant 69
 call String.appendChar 2
-push constant 111
+push constant 68
 call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 113
-call String.appendChar 2
-push constant 117
-call String.appendChar 2
-push constant 105
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 0
-push constant 4
-call Screen.printString 3
+call Input.showMessage 1
 pop temp 0
-label WHILE_EXP0
-push local 1
+push constant 0
 not
-not
-if-goto WHILE_END0
-label WHILE_EXP1
+pop local 2
+label IF_FALSE2
+push local 3
+push constant 3
+eq
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
 push local 0
 push constant 0
 eq
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
+push constant 51
+call String.new 1
+push constant 67
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 71
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 65
+call String.appendChar 2
+push constant 76
+call String.appendChar 2
+push constant 85
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 73
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 89
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 85
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 87
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 33
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 67
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 68
+call String.appendChar 2
+call Input.showMessage 1
+pop temp 0
+goto IF_END4
+label IF_FALSE4
+push constant 36
+call String.new 1
+push constant 89
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 85
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 76
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 83
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 80
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 67
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 68
+call String.appendChar 2
+call Input.showMessage 1
+pop temp 0
+label IF_END4
+push constant 0
 not
-if-goto WHILE_END1
-call Keyboard.keyPressed 0
-pop local 0
+pop local 2
+label IF_FALSE3
 goto WHILE_EXP1
 label WHILE_END1
-push local 0
-push constant 81
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 0
-not
-pop local 1
-goto IF_END0
-label IF_FALSE0
-push pointer 0
-call tictactoe.playGame 1
+push static 0
+call Board.dispose 1
 pop temp 0
-label IF_END0
 goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-function tictactoe.playGame 3
+function TicTacToe.play 4
+push constant 0
+pop local 0
 push argument 0
-pop pointer 0
-call Screen.clearScreen 0
-pop temp 0
-push pointer 0
-call tictactoe.getPlayerTurn 1
-pop local 1
-push local 1
-push constant 1
+push constant 0
 eq
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push constant 15
+label WHILE_EXP0
+push local 0
+not
+not
+if-goto WHILE_END0
+push constant 43
 call String.new 1
+push constant 69
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 69
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
 push constant 80
 call String.appendChar 2
-push constant 108
+push constant 79
 call String.appendChar 2
-push constant 97
+push constant 83
 call String.appendChar 2
-push constant 121
+push constant 73
 call String.appendChar 2
-push constant 101
+push constant 84
 call String.appendChar 2
-push constant 114
+push constant 73
+call String.appendChar 2
+push constant 79
+call String.appendChar 2
+push constant 78
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 40
 call String.appendChar 2
 push constant 32
 call String.appendChar 2
 push constant 49
 call String.appendChar 2
-push constant 39
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
 push constant 32
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 117
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 0
-push constant 0
-call Screen.printString 3
-pop temp 0
-goto IF_END0
-label IF_FALSE0
-push constant 15
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 108
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 121
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 50
-call String.appendChar 2
-push constant 39
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 117
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 0
-push constant 0
-call Screen.printString 3
-pop temp 0
-label IF_END0
-push constant 27
-call String.new 1
-push constant 67
-call String.appendChar 2
-push constant 104
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
-push constant 111
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 97
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 117
-call String.appendChar 2
-push constant 109
-call String.appendChar 2
-push constant 98
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 98
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 116
-call String.appendChar 2
-push constant 119
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 110
-call String.appendChar 2
-push constant 32
-call String.appendChar 2
-push constant 49
 call String.appendChar 2
 push constant 45
 call String.appendChar 2
+push constant 32
+call String.appendChar 2
 push constant 57
-call String.appendChar 2
-push constant 0
-push constant 1
-call Screen.printString 3
-pop temp 0
-push constant 17
-call String.new 1
-push constant 80
-call String.appendChar 2
-push constant 114
-call String.appendChar 2
-push constant 101
-call String.appendChar 2
-push constant 115
-call String.appendChar 2
-push constant 115
 call String.appendChar 2
 push constant 32
 call String.appendChar 2
-push constant 69
+push constant 41
 call String.appendChar 2
-push constant 83
+push constant 32
 call String.appendChar 2
-push constant 67
+push constant 124
+call String.appendChar 2
+push constant 124
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+push constant 39
+call String.appendChar 2
+push constant 48
+call String.appendChar 2
+push constant 39
 call String.appendChar 2
 push constant 32
 call String.appendChar 2
@@ -548,161 +617,150 @@ push constant 111
 call String.appendChar 2
 push constant 32
 call String.appendChar 2
-push constant 113
+push constant 82
 call String.appendChar 2
-push constant 117
+push constant 69
 call String.appendChar 2
-push constant 105
+push constant 83
 call String.appendChar 2
-push constant 116
+push constant 84
 call String.appendChar 2
+push constant 65
+call String.appendChar 2
+push constant 82
+call String.appendChar 2
+push constant 84
+call String.appendChar 2
+push constant 32
+call String.appendChar 2
+call Input.readInput 1
+pop local 1
+push local 1
 push constant 0
-push constant 2
-call Screen.printString 3
-pop temp 0
-call Keyboard.keyPressed 0
-pop local 0
-push local 0
-push constant 140
 eq
 if-goto IF_TRUE1
 goto IF_FALSE1
 label IF_TRUE1
-push pointer 0
-call tictactoe.dispose 1
-pop temp 0
 push constant 0
 return
 label IF_FALSE1
-push local 0
-push constant 48
-gt
-push local 0
-and
-push constant 58
-lt
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
+push local 1
+call TicTacToe.inputToMove 1
+pop local 2
+push static 0
 push constant 0
-return
-label IF_FALSE2
-push constant 0
-return
-function tictactoe.updateBoard 3
-push argument 0
-pop pointer 0
-push pointer 0
-call tictactoe.getPlayerTurn 1
-pop local 0
-push argument 1
-push this 0
+push local 2
 add
+pop pointer 1
+push that 0
+push constant 1
+push local 2
+add
+pop pointer 1
+push that 0
+call Board.isFree 3
+pop local 0
+goto WHILE_EXP0
+label WHILE_END0
+push static 0
+push constant 0
+push local 2
+add
+pop pointer 1
+push that 0
+push constant 1
+push local 2
+add
+pop pointer 1
+push that 0
+push argument 1
+call Board.makeMove 4
+pop temp 0
+push static 0
+push constant 0
+push local 2
+add
+pop pointer 1
+push that 0
+push constant 1
+push local 2
+add
+pop pointer 1
+push that 0
+push argument 1
+call Board.drawMove 4
+pop temp 0
+push local 2
+call Array.dispose 1
+pop temp 0
+call TicTacToe.processBoard 0
+return
+goto IF_END0
+label IF_FALSE0
+call TicTacToe.processBoard 0
+return
+label IF_END0
+function TicTacToe.getOtherPiece 0
+push argument 0
+push static 2
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push static 1
+return
+goto IF_END0
+label IF_FALSE0
+push static 2
+return
+label IF_END0
+function TicTacToe.getOtherPlayer 0
+push argument 0
+push constant 0
+eq
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+return
+goto IF_END0
+label IF_FALSE0
+push constant 0
+return
+label IF_END0
+function TicTacToe.inputToMove 1
+push constant 2
+call Array.new 1
+pop local 0
+push constant 0
 push local 0
+add
+push argument 0
+push constant 1
+sub
+push constant 3
+call Math.divide 2
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
+push constant 1
+push local 0
+add
+push argument 0
+push constant 1
+sub
+push constant 3
+push constant 0
+push local 0
+add
+pop pointer 1
+push that 0
+call Math.multiply 2
+sub
 pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
 push local 0
-push constant 1
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 0
-push constant 1
-call X.new 2
-pop local 2
-push local 2
-push argument 1
-call X.drawX 2
-pop temp 0
-goto IF_END0
-label IF_FALSE0
-push constant 0
-push constant 0
-call Circle.new 2
-pop local 1
-push local 1
-push argument 1
-call Circle.drawCircle 2
-pop temp 0
-label IF_END0
-push constant 0
-return
-function tictactoe.getPlayerTurn 4
-push argument 0
-pop pointer 0
-push constant 0
-pop local 0
-push constant 0
-pop local 1
-push constant 0
-pop local 2
-label WHILE_EXP0
-push local 2
-push constant 9
-lt
-not
-if-goto WHILE_END0
-push local 2
-push this 0
-add
-pop pointer 1
-push that 0
-push constant 1
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push local 0
-push constant 1
-add
-pop local 0
-label IF_FALSE0
-push local 2
-push this 0
-add
-pop pointer 1
-push that 0
-push constant 2
-eq
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push local 1
-push constant 1
-add
-pop local 1
-label IF_FALSE1
-push local 2
-push constant 1
-add
-pop local 2
-goto WHILE_EXP0
-label WHILE_END0
-push constant 0
-pop local 3
-push local 0
-push local 1
-gt
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
-push constant 2
-pop local 3
-goto IF_END2
-label IF_FALSE2
-push constant 1
-pop local 3
-label IF_END2
-push local 3
-return
-function tictactoe.dispose 0
-push argument 0
-pop pointer 0
-push pointer 0
-call Memory.dealloc 1
-pop temp 0
-push constant 0
 return
