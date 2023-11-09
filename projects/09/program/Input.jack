@@ -11,7 +11,7 @@ class Input {
 	function void eraseMessage() {
 		var String s;
 		do Output.moveCursor(Ir,Ic);
-		let s = "                                                 ";
+		let s = "                                                               ";
 		do Output.printString(s);
 		do s.dispose();
 		return;
@@ -34,7 +34,7 @@ class Input {
 			do Output.printString(s);
 			let c = Keyboard.readChar();
 			// 48 to 57
-			if((c > 47) & (c < 58)) {
+			if((c > 47) & (c < 58) | (c = 128)) {
 				do s.dispose();
 				return c-48;
 			}
@@ -42,7 +42,7 @@ class Input {
 		return 0;
 	}
 	
-	function int waitForZeroOrOne(String s) {
+	function int playerInput(String s) {
 		var char c;
 		var int choice;
 		do Input.eraseMessage();		
