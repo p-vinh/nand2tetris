@@ -4,23 +4,10 @@ call Memory.alloc 1
 pop pointer 0
 push argument 0
 pop this 0
-push argument 0
-push constant 1
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
 push constant 16
 pop this 1
 push constant 16
 pop this 2
-goto IF_END0
-label IF_FALSE0
-push constant 16
-pop this 1
-push constant 16
-pop this 2
-label IF_END0
 push pointer 0
 return
 function Pieces.getType 0
@@ -40,14 +27,14 @@ label IF_TRUE0
 push pointer 0
 push argument 1
 push argument 2
-call Pieces.drawCircle 3
+call Pieces.drawCross 3
 pop temp 0
 goto IF_END0
 label IF_FALSE0
 push pointer 0
 push argument 1
 push argument 2
-call Pieces.drawCross 3
+call Pieces.drawCircle 3
 pop temp 0
 label IF_END0
 push constant 0

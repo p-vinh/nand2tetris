@@ -677,7 +677,7 @@ push argument 2
 call Board.colToX 2
 push this 5
 push argument 3
-call Piece.getWidth 1
+call Pieces.getWidth 1
 sub
 push constant 2
 call Math.divide 2
@@ -688,7 +688,7 @@ push argument 1
 call Board.rowToY 2
 push this 5
 push argument 3
-call Piece.getHeight 1
+call Pieces.getHeight 1
 sub
 push constant 2
 call Math.divide 2
@@ -697,7 +697,7 @@ pop local 1
 push argument 3
 push local 0
 push local 1
-call Piece.drawPiece 3
+call Pieces.drawPiece 3
 pop temp 0
 push constant 0
 return
@@ -711,7 +711,7 @@ call Board.posToIndex 3
 push this 0
 add
 push argument 3
-call Piece.getType 1
+call Pieces.getType 1
 pop temp 0
 pop pointer 1
 push temp 0

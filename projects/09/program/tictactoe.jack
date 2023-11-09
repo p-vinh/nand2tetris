@@ -3,10 +3,6 @@
 class TicTacToe {
     static Board board;
     static Pieces Cross, Circle;
-    static AI ai;
-    static int callCount;
-    static boolean display;
-    static int x1;
 
     function int processBoard() {
         do board.evaluateBoard();
@@ -26,9 +22,8 @@ class TicTacToe {
     function void init() {
 		do Input.init();
         let board = Board.new(200,60);
-		let Cross = Piece.new(1);
-		let Circle = Piece.new(2);
-        let ai = AI.new(board, Cross, Circle);
+		let Cross = Pieces.new(1);
+		let Circle = Pieces.new(2);
 		return;
 	}
 
@@ -38,13 +33,15 @@ class TicTacToe {
         var int result;
 
         while (true) {
-            let currentPlayer = InputUtil.waitForZeroOrOne("'1' TO LET SYSTEM MAKE THE FIRST MOVE || '0' TO MAKE THE FIRST STEP");
+            do Screen.clearScreen();
+            do TicTacToe.init();
+            let currentPlayer = Input.waitForZeroOrOne("Press for '0' Player 1 || '1' Player 2");
 			let currentPiece = Cross;
             let gameOver = false;
 
 
             while (~gameOver) {
-                let result = TicTacToe.play(currentPlayer,currentPiece);
+                let result = TicTacToe.play(currentPlayer, currentPiece);
 				
 				if(result = 0) {
 					let gameOver = true;
@@ -62,9 +59,9 @@ class TicTacToe {
 
 				if(result = 3) {
 					if(currentPlayer = 0) {
-						do Input.showMessage("CONGRALUTIONS! YOU WON! || PRESS 'ENTER' TO PROCEED");
+						do Input.showMessage("Player 1 Wins. || PRESS 'ENTER' TO PROCEED");
 					} else {
-						do Input.showMessage("YOU LOST || PRESS 'ENTER' TO PROCEED");
+						do Input.showMessage("Player 2 Wins. || PRESS 'ENTER' TO PROCEED");
 					}
 					let gameOver = true;
 				}
@@ -75,31 +72,44 @@ class TicTacToe {
 		return;
 	}
 
-    function int play(int player, Piece p) {
+    function int play(int player, Pieces p) {
 		var boolean validPlayerInput;
-		var int input;
-		var Array playerMove, computerMove;
+		var int input, X, Y;
+		var Array playerOneMove, playerTwoMove;
 		let validPlayerInput = false;
 		
-		if(player=0) {
+		if(player = 0) {
 			while(~validPlayerInput) { 
-				let input = Input.readInput("ENTER POSITION ( 1 - 9 ) || '0' to RESTART ");
-				if(input=0) {
+				let input = Input.readInput("Player 1's Turn || ENTER POSITION ( 1 - 9 ) || '0' to RESTART ");
+
+				if(input = 0) {
 					return 0;
 				}
-				let playerMove = TicTacToe.inputToMove(input);
-				let validPlayerInput = board.isFree(playerMove[0],playerMove[1]);
+
+				let playerOneMove = TicTacToe.inputToMove(input);
+				let validPlayerInput = board.isFree(playerOneMove[0],playerOneMove[1]);
 			}
 			
-			do board.makeMove(playerMove[0], playerMove[1], p);
-			do board.drawMove(playerMove[0], playerMove[1], p);
-			do playerMove.dispose();
+			do board.makeMove(playerOneMove[0], playerOneMove[1], p);
+			do board.drawMove(playerOneMove[0], playerOneMove[1], p);
+			do playerOneMove.dispose();
 			return TicTacToe.processBoard();
+
 		} else {
-			// let computerMove = TicTacToe.getComputerMove(p);
-			// do board.makeMove(computerMove[0],computerMove[1],p);
-			// do board.drawMove(computerMove[0],computerMove[1],p);
-			// do computerMove.dispose();
+			while(~validPlayerInput) { 
+				let input = Input.readInput("Player 2's Turn || ENTER POSITION ( 1 - 9 ) || '0' to RESTART ");
+
+				if(input = 0) {
+					return 0;
+				}
+
+				let playerTwoMove = TicTacToe.inputToMove(input);
+				let validPlayerInput = board.isFree(playerTwoMove[0],playerTwoMove[1]);
+			}
+			
+			do board.makeMove(playerTwoMove[0], playerTwoMove[1], p);
+			do board.drawMove(playerTwoMove[0], playerTwoMove[1], p);
+			do playerTwoMove.dispose();
 			return TicTacToe.processBoard();
 		}
 	}
@@ -123,8 +133,10 @@ class TicTacToe {
     function Array inputToMove(int input) {
 		var Array moves;
 		let moves = Array.new(2);
-		let moves[0] = (input - 1) / 3 ; //row;
+		let moves[0] = (input - 1) / 3 ;
 		let moves[1] = (input - 1)-(3 * moves[0]);
 		return moves;
 	}
+
+
 }

@@ -1,18 +1,14 @@
 
 class Pieces {
-	field int type; // 1 Circle, 2 Cross
-	field int width,height;
+	field int type; // 1 Cross, 2 Circle
+	field int width, height;
 	
 	constructor Pieces new(int t) {
 		let type = t;
 		
-		if(t = 1) {
-			let width = 16;
-			let height = 16;
-		} else {
-			let width = 16;
-			let height = 16;
-		}
+        let width = 16;
+        let height = 16;
+
 		return this;
 	}
 	
@@ -22,40 +18,40 @@ class Pieces {
 	
 	method void drawPiece(int x, int y) {
 		if(type = 1) {
-			do drawCircle(x, y);
-		} else {
 			do drawCross(x, y);
+		} else {
+			do drawCircle(x, y);
 		}
 		return;
 	}
 	
 	method void drawCircle(int x, int y) {
-		var int ro, ri, t;
+		var int radiusOutter, radiusInner, t;
 		let t = 4;
-		let ro = width/2;
-		let ri = ro-t;
+		let radiusOutter = width / 2;
+		let radiusInner = radiusOutter - t;
 		
-		do Screen.drawCircle(x+ro,y+ro,ro);
+		do Screen.drawCircle(x + radiusOutter, y + radiusOutter, radiusOutter);
 		do Screen.setColor(false);
-		do Screen.drawCircle(x+ro,y+ro,ri);
+		do Screen.drawCircle(x + radiusOutter, y + radiusOutter, radiusInner);
 		do Screen.setColor(true);
 		return;
 	}
 	
 	method void drawCross(int x, int y) {
-		var int t,i;
+		var int t, i;
 		let t = 4;
-		let i = t-1;
-		while(~(i<0)) {
+		let i = t - 1;
+		while(~(i < 0)) {
 		
-			do Screen.drawLine(x,y+height-i,x+width-i,y);
-			do Screen.drawLine(x+i,y+height,x+width,y+i);
+			do Screen.drawLine(x, y + height - i,x + width - i, y);
+			do Screen.drawLine(x + i, y + height, x + width, y + i);
 			
 			
-			do Screen.drawLine(x+i,y,x+width,y+height-i);
-			do Screen.drawLine(x,y+i,x+width-i,y+height);
+			do Screen.drawLine(x + i, y, x + width, y + height - i);
+			do Screen.drawLine(x, y + i, x + width - i, y + height);
 			
-			let i = i-1;
+			let i = i - 1;
 		}
 		return;
 	}

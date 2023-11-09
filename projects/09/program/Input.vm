@@ -120,7 +120,7 @@ pop temp 0
 push constant 0
 return
 function Input.showMessage 0
-call InputUtil.eraseMessage 0
+call Input.eraseMessage 0
 pop temp 0
 push static 0
 push static 1
@@ -135,7 +135,7 @@ pop temp 0
 push constant 0
 return
 function Input.readInput 2
-call InputUtil.eraseMessage 0
+call Input.eraseMessage 0
 pop temp 0
 label WHILE_EXP0
 push constant 0
@@ -174,7 +174,7 @@ label WHILE_END0
 push constant 0
 return
 function Input.waitForZeroOrOne 2
-call InputUtil.eraseMessage 0
+call Input.eraseMessage 0
 pop temp 0
 label WHILE_EXP0
 push constant 0

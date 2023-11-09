@@ -1,8 +1,4 @@
 function Main.main 0
-call Screen.clearScreen 0
-pop temp 0
-call TicTacToe.init 0
-pop temp 0
 call TicTacToe.start 0
 pop temp 0
 push constant 0
