@@ -1,20 +1,9 @@
-function Main.main 2
-call tictactoe.new 0
-pop local 0
-push local 0
-call tictactoe.drawBoard 1
+function Main.main 0
+call Screen.clearScreen 0
 pop temp 0
-call Keyboard.keyPressed 0
-pop local 1
-push local 1
-push constant 140
-eq
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push local 0
-call tictactoe.dispose 1
+call TicTacToe.init 0
 pop temp 0
-label IF_FALSE0
+call TicTacToe.start 0
+pop temp 0
 push constant 0
 return

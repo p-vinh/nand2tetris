@@ -1,9 +1,9 @@
 
-class Piece {
+class Pieces {
 	field int type; // 1 Circle, 2 Cross
 	field int width,height;
 	
-	constructor Piece new(int t) {
+	constructor Pieces new(int t) {
 		let type = t;
 		
 		if(t = 1) {
