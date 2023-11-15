@@ -1,20 +1,16 @@
 
 class Board {
 	
-	field Array boardArray; // 0 vacant, 1 Circle, 2 cross
+	field Array boardArray; // 0 open , 1 Circle, 2 cross
 	field int boardX, boardY, boardSize, thickness, cellSize;
-	field int winThickness; // thickness of the line drawn in case of win!
 	field boolean isWin, isDraw;
-	field int winMode; // 0 - row, 1-col, 2 - topdiag, 3 - bottom diag
-	field int winRow,winCol;// winning row or column
-	field int freeCellCount; // how many cells are free?
+	field int freeCellCount;
 
     constructor Board new(int x, int y) {		
 		let boardX = x;
 		let boardY = y;
 		let boardSize = 120;
 		let thickness = 3;
-		let winThickness = 4;
 		let cellSize = boardSize / 3;
 		let boardArray = Array.new(9);
 		do clearBoard();
@@ -73,10 +69,10 @@ class Board {
 		return;
 	}
 	
-	method boolean isWin() {
+	method boolean getIsWin() {
 		return isWin;
 	}
-	method boolean isDraw() {
+	method boolean getIsDraw() {
 		return isDraw;
 	}
 	
@@ -94,8 +90,6 @@ class Board {
 			let b3 = boardArray[posToIndex(r,2)];
 			if((b1 = b2) & (b2 = b3) & (b1 > 0)) {
 				let isWin = true;
-				let winMode = 0;
-				let winRow = r;
 				return;
 			}
 			let r = r + 1;
@@ -106,8 +100,6 @@ class Board {
 			let b3 = boardArray[posToIndex(2, c)];
 			if((b1 = b2) & (b2 = b3) & (b1 >0)) {
 				let isWin = true;
-				let winMode = 1;
-				let winCol = c;
 				return;
 			}
 			let c = c + 1;
@@ -118,7 +110,6 @@ class Board {
 		let b3 = boardArray[8];
 		if((b1 = b2) & (b2 = b3)& (b1 > 0)) {
 			let isWin = true;
-			let winMode = 2;
 			return;
 		}
 		
@@ -127,7 +118,6 @@ class Board {
 		let b3 = boardArray[2];
 		if((b1 = b2) & (b2 = b3) & (b1 > 0)) {
 			let isWin = true;
-			let winMode = 3;
 			return;
 		}
 		
@@ -143,8 +133,8 @@ class Board {
 	
 	method void drawMove(int row, int col, Pieces p) {
 		var int xl,yt;
-		let xl = colToX(col) + ((cellSize-p.getWidth())/2);
-		let yt = rowToY(row) + ((cellSize-p.getHeight())/2);
+		let xl = colToX(col) + ((cellSize - p.getWidth()) / 2);
+		let yt = rowToY(row) + ((cellSize - p.getHeight()) / 2);
 		do p.drawPiece(xl,yt);
 		return;
 	}
@@ -155,6 +145,7 @@ class Board {
 		return;
 	}
 	
+	// Plan to make an AI for this game in the future. This method for temporary use.
 	method Array getAvailableMoves() {
 		var Array moves;
 		var int r1, c1, counter;

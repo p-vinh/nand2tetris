@@ -58,22 +58,6 @@ class Main {
 	
 		return;
 	}
-
-
-    function int processBoard() {
-        do board.evaluateBoard();
-
-        if (board.isWin()) {
-            return 3;
-        }
-
-        if (board.isDraw()) {
-            return 2;
-        }
-
-        return 1;
-    }
-
     
     function int play(int player, Pieces p) {
 		var boolean validPlayerInput;
@@ -96,7 +80,17 @@ class Main {
 			do board.makeMove(playerOneMove[0], playerOneMove[1], p);
 			do board.drawMove(playerOneMove[0], playerOneMove[1], p);
 			do playerOneMove.dispose();
-			return Main.processBoard();
+			do board.evaluateBoard();
+
+			if (board.getIsWin()) {
+				return 3;
+			}
+
+			if (board.getIsDraw()) {
+				return 2;
+			}
+
+			return 1;
 
 		} else {
 			while(~validPlayerInput) { 
@@ -113,7 +107,17 @@ class Main {
 			do board.makeMove(playerTwoMove[0], playerTwoMove[1], p);
 			do board.drawMove(playerTwoMove[0], playerTwoMove[1], p);
 			do playerTwoMove.dispose();
-			return Main.processBoard();
+			do board.evaluateBoard();
+
+			if (board.getIsWin()) {
+				return 3;
+			}
+
+			if (board.getIsDraw()) {
+				return 2;
+			}
+
+			return 1;
 		}
 	}
 
