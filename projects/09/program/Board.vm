@@ -1,5 +1,5 @@
 function Board.new 0
-push constant 13
+push constant 9
 call Memory.alloc 1
 pop pointer 0
 push argument 0
@@ -10,8 +10,6 @@ push constant 120
 pop this 3
 push constant 3
 pop this 4
-push constant 4
-pop this 6
 push this 3
 push constant 3
 call Math.divide 2
@@ -56,11 +54,11 @@ function Board.clearBoard 1
 push argument 0
 pop pointer 0
 push constant 9
-pop this 12
+pop this 8
+push constant 0
+pop this 6
 push constant 0
 pop this 7
-push constant 0
-pop this 8
 label WHILE_EXP0
 push local 0
 push constant 9
@@ -215,15 +213,15 @@ call Screen.drawRectangle 4
 pop temp 0
 push constant 0
 return
-function Board.isWin 0
+function Board.getIsWin 0
+push argument 0
+pop pointer 0
+push this 6
+return
+function Board.getIsDraw 0
 push argument 0
 pop pointer 0
 push this 7
-return
-function Board.isDraw 0
-push argument 0
-pop pointer 0
-push this 8
 return
 function Board.evaluateBoard 5
 push argument 0
@@ -233,9 +231,9 @@ pop local 0
 push constant 0
 pop local 1
 push constant 0
-pop this 7
+pop this 6
 push constant 0
-pop this 8
+pop this 7
 label WHILE_EXP0
 push local 0
 push constant 3
@@ -285,11 +283,7 @@ goto IF_FALSE0
 label IF_TRUE0
 push constant 0
 not
-pop this 7
-push constant 0
-pop this 9
-push local 0
-pop this 10
+pop this 6
 push constant 0
 return
 label IF_FALSE0
@@ -348,11 +342,7 @@ goto IF_FALSE1
 label IF_TRUE1
 push constant 0
 not
-pop this 7
-push constant 1
-pop this 9
-push local 1
-pop this 11
+pop this 6
 push constant 0
 return
 label IF_FALSE1
@@ -396,9 +386,7 @@ goto IF_FALSE2
 label IF_TRUE2
 push constant 0
 not
-pop this 7
-push constant 2
-pop this 9
+pop this 6
 push constant 0
 return
 label IF_FALSE2
@@ -436,13 +424,11 @@ goto IF_FALSE3
 label IF_TRUE3
 push constant 0
 not
-pop this 7
-push constant 3
-pop this 9
+pop this 6
 push constant 0
 return
 label IF_FALSE3
-push this 12
+push this 8
 push constant 0
 eq
 if-goto IF_TRUE4
@@ -450,7 +436,7 @@ goto IF_FALSE4
 label IF_TRUE4
 push constant 0
 not
-pop this 8
+pop this 7
 push constant 0
 return
 label IF_FALSE4
@@ -503,10 +489,10 @@ pop temp 0
 pop pointer 1
 push temp 0
 pop that 0
-push this 12
+push this 8
 push constant 1
 sub
-pop this 12
+pop this 8
 push constant 0
 return
 function Board.getAvailableMoves 4
@@ -516,7 +502,7 @@ push constant 0
 pop local 1
 push constant 0
 pop local 2
-push this 12
+push this 8
 push constant 2
 call Math.multiply 2
 call Array.new 1

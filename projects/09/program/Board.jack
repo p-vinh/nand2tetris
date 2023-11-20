@@ -108,7 +108,7 @@ class Board {
 		let b1 = boardArray[0];
 		let b2 = boardArray[4];
 		let b3 = boardArray[8];
-		if((b1 = b2) & (b2 = b3)& (b1 > 0)) {
+		if((b1 = b2) & (b2 = b3) & (b1 > 0)) {
 			let isWin = true;
 			return;
 		}

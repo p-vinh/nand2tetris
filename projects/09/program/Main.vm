@@ -429,28 +429,6 @@ goto WHILE_EXP0
 label WHILE_END0
 push constant 0
 return
-function Main.processBoard 0
-push static 0
-call Board.evaluateBoard 1
-pop temp 0
-push static 0
-call Board.isWin 1
-if-goto IF_TRUE0
-goto IF_FALSE0
-label IF_TRUE0
-push constant 3
-return
-label IF_FALSE0
-push static 0
-call Board.isDraw 1
-if-goto IF_TRUE1
-goto IF_FALSE1
-label IF_TRUE1
-push constant 2
-return
-label IF_FALSE1
-push constant 1
-return
 function Main.play 6
 push constant 0
 pop local 0
@@ -655,7 +633,26 @@ pop temp 0
 push local 4
 call Array.dispose 1
 pop temp 0
-call Main.processBoard 0
+push static 0
+call Board.evaluateBoard 1
+pop temp 0
+push static 0
+call Board.getIsWin 1
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
+push constant 3
+return
+label IF_FALSE2
+push static 0
+call Board.getIsDraw 1
+if-goto IF_TRUE3
+goto IF_FALSE3
+label IF_TRUE3
+push constant 2
+return
+label IF_FALSE3
+push constant 1
 return
 goto IF_END0
 label IF_FALSE0
@@ -795,12 +792,12 @@ pop local 1
 push local 1
 push constant 0
 eq
-if-goto IF_TRUE2
-goto IF_FALSE2
-label IF_TRUE2
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
 push constant 0
 return
-label IF_FALSE2
+label IF_FALSE4
 push local 1
 call Main.inputToMove 1
 pop local 5
@@ -850,7 +847,26 @@ pop temp 0
 push local 5
 call Array.dispose 1
 pop temp 0
-call Main.processBoard 0
+push static 0
+call Board.evaluateBoard 1
+pop temp 0
+push static 0
+call Board.getIsWin 1
+if-goto IF_TRUE5
+goto IF_FALSE5
+label IF_TRUE5
+push constant 3
+return
+label IF_FALSE5
+push static 0
+call Board.getIsDraw 1
+if-goto IF_TRUE6
+goto IF_FALSE6
+label IF_TRUE6
+push constant 2
+return
+label IF_FALSE6
+push constant 1
 return
 label IF_END0
 function Main.getOtherPiece 0
