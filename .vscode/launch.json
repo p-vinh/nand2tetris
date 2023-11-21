@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "JackAnalyzer",
+            "request": "launch",
+            "mainClass": "SyntaxAnalyzer.JackAnalyzer",
+            "projectName": "nand2tetris_79fde318"
+        },
+        {
+            "type": "java",
+            "name": "JackAnalyzer",
+            "request": "launch",
+            "mainClass": "JackAnalyzer",
+            "projectName": "nand2tetris_79fde318"
+        },
+        {
+            "type": "java",
             "name": "VMTranslator",
             "request": "launch",
             "mainClass": "TEST.VMTranslator",
