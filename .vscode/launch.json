@@ -9,7 +9,7 @@
             "name": "JackAnalyzer",
             "request": "launch",
             "mainClass": "SyntaxAnalyzer.JackAnalyzer",
-            "projectName": "nand2tetris_79fde318"
+            "projectName": "nand2tetris_937a9ed"
         },
         {
             "type": "java",

@@ -2,7 +2,6 @@ package SyntaxAnalyzer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -55,14 +54,13 @@ public class JackTokenizer {
      * no current token.
      */
     public void advance() {
-        scanner.useDelimiter("\\s+|\\n|\\r|\\t|\\{|\\}|\\(|\\)|\\[|\\]|\\.|,|;|\\+|-|\\*|\\/|\\||=|~");
-        
+        scanner.useDelimiter("\\s+|\\n|\\r|\\t");
         if (hasMoreTokens()) {
-            currentToken = scanner.next();
 
+            currentToken = scanner.next().replaceAll("//.*|/\\*\\*.*?\\\\*/", "").trim(); // Remove comments
+            
             if (keywords.containsKey(currentToken)) {
                 currentToken = keywords.get(currentToken);
-
             }
             else if (currentToken.matches("\\d+"))
                 currentToken = "INT_CONST";
@@ -72,6 +70,7 @@ public class JackTokenizer {
                 currentToken = "IDENTIFIER";
             else
                 currentToken = "SYMBOL";
+            
         }
     }
 
