@@ -8,20 +8,17 @@ import java.io.PrintWriter;
 public class JackAnalyzer {
     private static String fileName;
     private static JackTokenizer tokenizer;
-    private static PrintWriter writer;
+
     public static void translateFile() {
-        try {
-            writer = new PrintWriter(new File(fileName + "T.xml"));
 
-            while (tokenizer.hasMoreTokens()) {
-                tokenizer.advance();
-            }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            writer.close();
+        while (tokenizer.hasMoreTokens()) {
+            tokenizer.advance();
+            String token = tokenizer.getToken();
+            System.out.println(token);
         }
+
+        
     }
 
     public static void main(String[] args) {
@@ -51,7 +48,7 @@ public class JackAnalyzer {
         //         e.printStackTrace();
         //     }
         // }
-
+        
         try {
             tokenizer = new JackTokenizer(new File("projects\\10\\ArrayTest\\Main.jack"));
             translateFile();

@@ -13,6 +13,13 @@
         },
         {
             "type": "java",
+            "name": "JackAnalyzerPC",
+            "request": "launch",
+            "mainClass": "SyntaxAnalyzer.JackAnalyzer",
+            "projectName": "nand2tetris_937a9ed"
+        },
+        {
+            "type": "java",
             "name": "VMTranslator",
             "request": "launch",
             "mainClass": "TEST.VMTranslator",

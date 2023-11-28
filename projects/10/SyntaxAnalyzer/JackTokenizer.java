@@ -3,51 +3,63 @@ package SyntaxAnalyzer;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Scanner;
+import java.util.LinkedList;
+import java.util.Set;
 
 public class JackTokenizer {
     private final String[] SYMBOLS = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<",
             ">", "=", "~" };
-    private final String[] KEYWORDS = { "class", "constructor", "function", "method", "field", "static", "var", "int",
-            "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
     private String fileName;
     private String currentToken; // Current token
     private String tokenType; // Type of current token
-    private Map<String, String> keywords;
+    private Set<String> keywords;
+    private Set<String> symbols;
+    private Queue<String> tokenStrings;
     private Scanner scanner;
 
     public JackTokenizer(File file) throws IOException {
         this.fileName = file.getName();
         this.currentToken = "";
+        this.tokenStrings = new LinkedList<>();
         initKeywords();
-
+        initSymbols();
         this.scanner = new Scanner(file);
     }
 
     private void initKeywords() {
-        keywords = new HashMap<>();
-        keywords.put("class", "CLASS");
-        keywords.put("constructor", "CONSTRUCTOR");
-        keywords.put("function", "FUNCTION");
-        keywords.put("method", "METHOD");
-        keywords.put("field", "FIELD");
-        keywords.put("static", "STATIC");
-        keywords.put("var", "VAR");
-        keywords.put("int", "INT");
-        keywords.put("char", "CHAR");
-        keywords.put("boolean", "BOOLEAN");
-        keywords.put("void", "VOID");
-        keywords.put("true", "TRUE");
-        keywords.put("false", "FALSE");
-        keywords.put("null", "NULL");
-        keywords.put("this", "THIS");
-        keywords.put("let", "LET");
-        keywords.put("do", "DO");
-        keywords.put("if", "IF");
-        keywords.put("else", "ELSE");
-        keywords.put("while", "WHILE");
-        keywords.put("return", "RETURN");
+        keywords = new HashSet<>();
+        keywords.add("class");
+        keywords.add("constructor");
+        keywords.add("function");
+        keywords.add("method");
+        keywords.add("field");
+        keywords.add("static");
+        keywords.add("var");
+        keywords.add("int");
+        keywords.add("char");
+        keywords.add("boolean");
+        keywords.add("void");
+        keywords.add("true");
+        keywords.add("false");
+        keywords.add("null");
+        keywords.add("this");
+        keywords.add("let");
+        keywords.add("do");
+        keywords.add("if");
+        keywords.add("else");
+        keywords.add("while");
+        keywords.add("return");
+    }
+
+    private void initSymbols() {
+        symbols = new HashSet<>();
+        for (String symbol : SYMBOLS) {
+            symbols.add(symbol);
+        }
     }
 
     /*
@@ -56,14 +68,48 @@ public class JackTokenizer {
      * no current token.
      */
     public void advance() {
-        scanner.skip("\\s+|\\n|/\\*\\*.*|//"); // Skip whitespace (including newlines)
-        if (hasMoreTokens()) {
-            currentToken = scanner.next();
-            
-            
-        
-            System.out.println(currentToken);
+        scanner.useDelimiter("/\\*\\*.*?\\*/|//|\\s+|\\n"); // Skip whitespace (including newlines)
+        if (!tokenStrings.isEmpty()) {
+            currentToken = tokenStrings.remove();
+            return;
+        } else {
+            if (hasMoreTokens()) {
+                currentToken = "";
+                String currentLine = scanner.nextLine().trim();
+    
+                if (currentLine.equals("")) {
+                    return;
+                }
+    
+                String comment = currentLine.length() >= 3 ? currentLine.substring(0, 3) : "";
+                if (comment.equals("/**")) {
+                    return;
+                }
+    
+                char[] lineBuffer = currentLine.toCharArray();
+    
+                StringBuffer token = new StringBuffer();
+                for (char character : lineBuffer) {
+                    if (symbols.contains(character + "")) {
+                        token.append(" " + character + " ");
+                    } else {
+                        token.append(character);
+                    }
+                }
+    
+                String[] tokens = token.toString().replaceAll("\\s+", " ").split(" ");
+                StringBuffer sb = new StringBuffer();
 
+                for (int i = 0; i < tokens.length; i++) {
+                    if (tokens[i].contains("\"")) {
+                        sb.append(tokens[i]);
+
+                    } else 
+                        tokenStrings.add(t);
+                }
+            }
+
+            currentToken = tokenStrings.remove();
         }
     }
 
@@ -79,8 +125,8 @@ public class JackTokenizer {
      */
     public String tokenType() {
         if (!currentToken.isEmpty()) {
-            if (keywords.containsKey(currentToken)) {
-                tokenType = keywords.get(currentToken);
+            if (keywords.contains(currentToken)) {
+                tokenType = currentToken.toUpperCase();
             } else if (currentToken.matches("\\d+"))
                 tokenType = "INT_CONST";
             else if (currentToken.matches("\".*\""))
@@ -101,6 +147,10 @@ public class JackTokenizer {
      */
     public String keyWord() {
         return "";
+    }
+
+    public String getToken() {
+        return currentToken;
     }
 
     /*
