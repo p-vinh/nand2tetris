@@ -7,6 +7,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class JackTokenizer {
+    private final String[] SYMBOLS = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<",
+            ">", "=", "~" };
+    private final String[] KEYWORDS = { "class", "constructor", "function", "method", "field", "static", "var", "int",
+            "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
     private String fileName;
     private String currentToken; // Current token
     private String tokenType; // Type of current token
@@ -46,31 +50,20 @@ public class JackTokenizer {
         keywords.put("return", "RETURN");
     }
 
-
-
     /*
      * Gets the next token from the input and makes it the current token. This
      * method should only be called if hasMoreTokens() is true. Initially there is
      * no current token.
      */
     public void advance() {
-        scanner.useDelimiter("\\s+|\\n|\\r|\\t");
+        scanner.skip("\\s+|\\n|/\\*\\*.*|//"); // Skip whitespace (including newlines)
         if (hasMoreTokens()) {
+            currentToken = scanner.next();
+            
+            
+        
+            System.out.println(currentToken);
 
-            currentToken = scanner.next().replaceAll("//.*|/\\*\\*.*?\\\\*/", "").trim(); // Remove comments
-            
-            if (keywords.containsKey(currentToken)) {
-                currentToken = keywords.get(currentToken);
-            }
-            else if (currentToken.matches("\\d+"))
-                currentToken = "INT_CONST";
-            else if (currentToken.matches("\".*\""))
-                currentToken = "STRING_CONST";
-            else if (currentToken.matches("\\w+"))
-                currentToken = "IDENTIFIER";
-            else
-                currentToken = "SYMBOL";
-            
         }
     }
 
@@ -85,11 +78,25 @@ public class JackTokenizer {
      * Returns the type of the current token, as a constant.
      */
     public String tokenType() {
-        return currentToken;
+        if (!currentToken.isEmpty()) {
+            if (keywords.containsKey(currentToken)) {
+                tokenType = keywords.get(currentToken);
+            } else if (currentToken.matches("\\d+"))
+                tokenType = "INT_CONST";
+            else if (currentToken.matches("\".*\""))
+                tokenType = "STRING_CONST";
+            else if (currentToken.matches("\\w+"))
+                tokenType = "IDENTIFIER";
+            else
+                tokenType = "SYMBOL";
+
+        }
+        return tokenType;
     }
 
     /*
-     * Returns the keyword which is the current token as a constant. Should be called only when
+     * Returns the keyword which is the current token as a constant. Should be
+     * called only when
      * tokenType() is KEYWORD.
      */
     public String keyWord() {
@@ -140,6 +147,5 @@ public class JackTokenizer {
         else
             throw new IllegalStateException("Current token is not a string");
     }
-
 
 }
