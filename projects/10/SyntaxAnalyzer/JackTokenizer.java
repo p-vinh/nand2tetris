@@ -105,7 +105,7 @@ public class JackTokenizer {
                         sb.append(tokens[i]);
 
                     } else 
-                        tokenStrings.add(t);
+                        tokenStrings.add(tokens[i]);
                 }
             }
 
