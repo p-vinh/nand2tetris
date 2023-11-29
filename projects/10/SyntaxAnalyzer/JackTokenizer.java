@@ -15,6 +15,7 @@ public class JackTokenizer {
             ">", "=", "~" };
     private String fileName;
     private String currentToken; // Current token
+    private String currentString;
     private String tokenType; // Type of current token
     private Set<String> keywords;
     private Set<String> symbols;
@@ -76,18 +77,18 @@ public class JackTokenizer {
             if (hasMoreTokens()) {
                 currentToken = "";
                 String currentLine = scanner.nextLine().trim();
-    
+
                 if (currentLine.equals("")) {
                     return;
                 }
-    
+
                 String comment = currentLine.length() >= 3 ? currentLine.substring(0, 3) : "";
                 if (comment.equals("/**")) {
                     return;
                 }
-    
+
                 char[] lineBuffer = currentLine.toCharArray();
-    
+
                 StringBuffer token = new StringBuffer();
                 for (char character : lineBuffer) {
                     if (symbols.contains(character + "")) {
@@ -96,15 +97,20 @@ public class JackTokenizer {
                         token.append(character);
                     }
                 }
-    
+
                 String[] tokens = token.toString().replaceAll("\\s+", " ").split(" ");
                 StringBuffer sb = new StringBuffer();
 
                 for (int i = 0; i < tokens.length; i++) {
                     if (tokens[i].contains("\"")) {
-                        sb.append(tokens[i]);
+                        sb.append(tokens[i++].replace("\"", ""));
 
-                    } else 
+                        while (tokens[i].contains("\"") == false)
+                            sb.append(" " + tokens[i++]);
+
+                        tokenStrings.add(sb.toString());
+
+                    } else
                         tokenStrings.add(tokens[i]);
                 }
             }
