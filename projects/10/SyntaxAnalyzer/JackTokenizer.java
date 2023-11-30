@@ -2,9 +2,7 @@ package SyntaxAnalyzer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.LinkedList;
@@ -13,17 +11,15 @@ import java.util.Set;
 public class JackTokenizer {
     private final String[] SYMBOLS = { "{", "}", "(", ")", "[", "]", ".", ",", ";", "+", "-", "*", "/", "&", "|", "<",
             ">", "=", "~" };
-    private String fileName;
+    private final String[] KEYWORDS = { "class", "constructor", "function", "method", "field", "static", "var", "int",
+            "char", "boolean", "void", "true", "false", "null", "this", "let", "do", "if", "else", "while", "return" };
     private String currentToken; // Current token
-    private String currentString;
-    private String tokenType; // Type of current token
     private Set<String> keywords;
     private Set<String> symbols;
     private Queue<String> tokenStrings;
     private Scanner scanner;
 
     public JackTokenizer(File file) throws IOException {
-        this.fileName = file.getName();
         this.currentToken = "";
         this.tokenStrings = new LinkedList<>();
         initKeywords();
@@ -33,27 +29,9 @@ public class JackTokenizer {
 
     private void initKeywords() {
         keywords = new HashSet<>();
-        keywords.add("class");
-        keywords.add("constructor");
-        keywords.add("function");
-        keywords.add("method");
-        keywords.add("field");
-        keywords.add("static");
-        keywords.add("var");
-        keywords.add("int");
-        keywords.add("char");
-        keywords.add("boolean");
-        keywords.add("void");
-        keywords.add("true");
-        keywords.add("false");
-        keywords.add("null");
-        keywords.add("this");
-        keywords.add("let");
-        keywords.add("do");
-        keywords.add("if");
-        keywords.add("else");
-        keywords.add("while");
-        keywords.add("return");
+        for (String keyword : KEYWORDS) {
+            keywords.add(keyword);
+        }
     }
 
     private void initSymbols() {
@@ -69,21 +47,19 @@ public class JackTokenizer {
      * no current token.
      */
     public void advance() {
-        scanner.useDelimiter("/\\*\\*.*?\\*/|//|\\s+|\\n"); // Skip whitespace (including newlines)
+        scanner.useDelimiter("/\\*\\*.*?\\*/|\\s+|\\n"); // Skip whitespace (including newlines)
         if (!tokenStrings.isEmpty()) {
             currentToken = tokenStrings.remove();
             return;
         } else {
             if (hasMoreTokens()) {
-                currentToken = "";
-                String currentLine = scanner.nextLine().trim();
+                String currentLine = scanner.nextLine().replaceAll("//.*", "").trim();
+                
 
-                if (currentLine.equals("")) {
-                    return;
-                }
-
+                // Process All comments
                 String comment = currentLine.length() >= 3 ? currentLine.substring(0, 3) : "";
-                if (comment.equals("/**")) {
+                if (currentLine.equals("") || currentLine.startsWith("//") || comment.equals("/**") || currentLine.startsWith("*") || comment.equals("*/")) {
+                    advance();
                     return;
                 }
 
@@ -99,19 +75,22 @@ public class JackTokenizer {
                 }
 
                 String[] tokens = token.toString().replaceAll("\\s+", " ").split(" ");
-                StringBuffer sb = new StringBuffer();
-
+                StringBuffer sb;
                 for (int i = 0; i < tokens.length; i++) {
-                    if (tokens[i].contains("\"")) {
-                        sb.append(tokens[i++].replace("\"", ""));
-
-                        while (tokens[i].contains("\"") == false)
-                            sb.append(" " + tokens[i++]);
-
-                        tokenStrings.add(sb.toString());
-
+                    if (tokens[i].equals("")) {
+                        continue;
                     } else
-                        tokenStrings.add(tokens[i]);
+                        if (tokens[i].startsWith("\"")) {
+                            sb = new StringBuffer();
+                            sb.append(tokens[i++].replace("\"", "")); // Skip the first quote
+
+                            // Keep appending until we find the end quote
+                            while (!tokens[i].endsWith("\""))
+                                sb.append(" " + tokens[i++]);
+                            sb.append(" " + tokens[i].replace("\"", "")); // Skip the last quote
+                            tokenStrings.add(sb.toString());
+                        } else
+                            tokenStrings.add(tokens[i]);
                 }
             }
 
@@ -132,18 +111,19 @@ public class JackTokenizer {
     public String tokenType() {
         if (!currentToken.isEmpty()) {
             if (keywords.contains(currentToken)) {
-                tokenType = currentToken.toUpperCase();
-            } else if (currentToken.matches("\\d+"))
-                tokenType = "INT_CONST";
-            else if (currentToken.matches("\".*\""))
-                tokenType = "STRING_CONST";
-            else if (currentToken.matches("\\w+"))
-                tokenType = "IDENTIFIER";
-            else
-                tokenType = "SYMBOL";
-
+                // return tokenType = currentToken.toUpperCase();
+                return "keyword";
+            } else if (symbols.contains(currentToken)) {
+                return "symbol";
+            } else if (currentToken.matches("^[0-9]+")) {
+                return "integerConstant";
+            } else if (currentToken.matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
+                return "identifier";
+            } else {
+                return "stringConstant";
+            }
         }
-        return tokenType;
+        return "UNKNOWN";
     }
 
     /*
@@ -152,7 +132,7 @@ public class JackTokenizer {
      * tokenType() is KEYWORD.
      */
     public String keyWord() {
-        return "";
+        return currentToken;
     }
 
     public String getToken() {
@@ -163,10 +143,8 @@ public class JackTokenizer {
      * Returns the character which is the current token. Should be called only when
      * tokenType() is SYMBOL.
      */
-    public char symbol() {
-        if (tokenType().equals("SYMBOL"))
-            throw new IllegalStateException("Current token is not a symbol");
-        return currentToken.charAt(0);
+    public String symbol() {
+        return currentToken;
     }
 
     /*
@@ -174,12 +152,7 @@ public class JackTokenizer {
      * called only when tokenType() is IDENTIFIER or INT_CONST.
      */
     public String identifier() {
-        if (tokenType().equals("IDENTIFIER"))
-            return currentToken;
-        else if (tokenType().equals("INT_CONST"))
-            return currentToken;
-        else
-            throw new IllegalStateException("Current token is not an identifier or integer");
+        return currentToken;
     }
 
     /*
@@ -187,10 +160,7 @@ public class JackTokenizer {
      * tokenType() is INT_CONST.
      */
     public int intVal() {
-        if (tokenType().equals("INT_CONST"))
-            return Integer.parseInt(currentToken);
-        else
-            throw new IllegalStateException("Current token is not an integer");
+        return Integer.parseInt(currentToken);
     }
 
     /*
@@ -198,10 +168,7 @@ public class JackTokenizer {
      * Should be called only when tokenType() is STRING_CONST.
      */
     public String stringVal() {
-        if (tokenType().equals("STRING_CONST"))
-            return currentToken.substring(1, currentToken.length() - 1);
-        else
-            throw new IllegalStateException("Current token is not a string");
+        return this.currentToken;
     }
 
 }

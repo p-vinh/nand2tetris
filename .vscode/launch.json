@@ -20,6 +20,14 @@
         },
         {
             "type": "java",
+            "name": "Project10Test",
+            "request": "launch",
+            "mainClass": "SyntaxAnalyzer.JackAnalyzer",
+            "projectName": "nand2tetris_937a9ed",
+            "args" : "${command:SpecifyProgramArgs}"
+        },
+        {
+            "type": "java",
             "name": "VMTranslator",
             "request": "launch",
             "mainClass": "TEST.VMTranslator",

@@ -9,52 +9,61 @@ public class JackAnalyzer {
     private static String fileName;
     private static JackTokenizer tokenizer;
 
-    public static void translateFile() {
+    public static void translateFile(File filepath) {
 
-
-        while (tokenizer.hasMoreTokens()) {
-            tokenizer.advance();
-            String token = tokenizer.getToken();
-            System.out.println(token);
+        try {
+            PrintWriter writer = new PrintWriter(filepath.getName().replace(".jack", "Test.xml"));
+            writer.println("<tokens>");
+            while (tokenizer.hasMoreTokens()) {
+                tokenizer.advance();
+                String token = tokenizer.getToken();
+                if (token.equals(">") || token.equals("<") || token.equals("&")) {
+                    token = token.replace("&", "&amp;");
+                    token = token.replace(">", "&gt;");
+                    token = token.replace("<", "&lt;");
+                }
+                String tokenType = tokenizer.tokenType();
+                writer.println("<" + tokenType + "> " + token + " </" + tokenType + ">");
+            }
+            writer.println("</tokens>");
+            writer.flush();
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
 
-        
+        // CompilationEngine compilationEngine = new CompilationEngine(new
+        // File("projects\\\\10\\\\ArrayTest\\\\Main.jack"));
+        // compilationEngine.CompileClass();
     }
 
     public static void main(String[] args) {
-        // if (args.length != 1) {
-        //     System.out.println("Usage: java JackAnalyzer <file.jack|dir>");
-        //     System.exit(1);
-        // }
+        if (args.length != 1) {
+            System.out.println("Usage: java JackAnalyzer <file.jack|dir>");
+            System.exit(1);
+        }
 
-        // File file = new File(args[0]);
+        File file = new File(args[0]);
 
-        // if (file.isDirectory())
-        //     for (File f : file.listFiles()) {
-        //         if (f.getName().endsWith(".jack")) {
-        //             try {
-        //                 // Run tokenizer
-        //                 JackTokenizer tokenizer = new JackTokenizer(f);
-        //             } catch (IOException e) {
-        //                 e.printStackTrace();
-        //             }
-        //         }
-        //     }
-        // else {
-        //     try {
-        //         JackTokenizer tokenizer = new JackTokenizer(file);
-
-        //     } catch (IOException e) {
-        //         e.printStackTrace();
-        //     }
-        // }
-        
-        try {
-            tokenizer = new JackTokenizer(new File("projects\\10\\ArrayTest\\Main.jack"));
-            translateFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (file.isDirectory())
+            for (File f : file.listFiles()) {
+                if (f.getName().endsWith(".jack")) {
+                    try {
+                        tokenizer = new JackTokenizer(f);
+                        translateFile(f);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        else {
+            try {
+                tokenizer = new JackTokenizer(file);
+                translateFile(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
-    
+
 }
