@@ -2,6 +2,7 @@ package SyntaxAnalyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Scanner;
@@ -16,7 +17,7 @@ public class JackTokenizer {
     private String currentToken; // Current token
     private Set<String> keywords;
     private Set<String> symbols;
-    private Queue<String> tokenStrings;
+    private Deque<String> tokenStrings;
     private Scanner scanner;
 
     public JackTokenizer(File file) throws IOException {
@@ -39,6 +40,10 @@ public class JackTokenizer {
         for (String symbol : SYMBOLS) {
             symbols.add(symbol);
         }
+    }
+
+    public void putBack() {
+        tokenStrings.addFirst(currentToken);
     }
 
     /*
@@ -171,4 +176,7 @@ public class JackTokenizer {
         return this.currentToken;
     }
 
+    public Queue<String> getTokenStrings() {
+        return tokenStrings;
+    }
 }
