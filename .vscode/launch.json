@@ -8,6 +8,13 @@
             "type": "java",
             "name": "JackAnalyzer",
             "request": "launch",
+            "mainClass": "JackAnalyzer",
+            "projectName": "nand2tetris_937a9ed"
+        },
+        {
+            "type": "java",
+            "name": "JackAnalyzer",
+            "request": "launch",
             "mainClass": "SyntaxAnalyzer.JackAnalyzer",
             "projectName": "nand2tetris_79fde318"
         },
@@ -24,7 +31,15 @@
             "request": "launch",
             "mainClass": "SyntaxAnalyzer.JackAnalyzer",
             "projectName": "nand2tetris_937a9ed",
-            "args" : "${command:SpecifyProgramArgs}"
+            "args": "${command:SpecifyProgramArgs}"
+        },
+        {
+            "type": "java",
+            "name": "Project11Test",
+            "request": "launch",
+            "mainClass": "JackAnalyzer",
+            "projectName": "nand2tetris_937a9ed",
+            "args": "${command:SpecifyProgramArgs}"
         },
         {
             "type": "java",

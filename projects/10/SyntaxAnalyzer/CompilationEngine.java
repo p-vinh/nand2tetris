@@ -115,15 +115,15 @@ public class CompilationEngine {
         Element varElement = this.document.createElement("classVarDec");
         this.root.appendChild(varElement);
         this.curRoot = varElement;
-    
+
         validateToken("static|field", tokenizer.getToken());
         createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
-    
+
         tokenizer.advance();
         createAndAppendElement(tokenizer.tokenType(), tokenizer.identifier());
-    
+
         tokenizer.advance();
-    
+
         if (tokenizer.getToken().equals(",")) {
             while (!tokenizer.getToken().equals(";")) {
                 createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -136,7 +136,7 @@ public class CompilationEngine {
             validateToken(";", tokenizer.getToken());
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
         }
-    
+
         this.curRoot = (Element) this.curRoot.getParentNode();
     }
 
@@ -150,13 +150,21 @@ public class CompilationEngine {
 
         // void | type
         tokenizer.advance();
-        validateToken("^[a-zA-Z_][a-zA-Z0-9_]*$", tokenizer.getToken());
-        createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        if (tokenizer.getToken().equals("void")) {
+            createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        } else if (tokenizer.getToken().equals("keyword")) {
+            createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        } else {
+            throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
+        }
 
         // subroutineName
         tokenizer.advance();
-        validateToken("^[a-zA-Z_][a-zA-Z0-9_]*$", tokenizer.getToken());
-        createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        if (tokenizer.getToken().matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
+            createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        } else {
+            throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
+        }
 
         // (
         tokenizer.advance();
@@ -176,7 +184,7 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ",) expected.");
         }
 
-        // subroutineBody
+        // SubroutineBody
         tokenizer.advance();
         if (!tokenizer.getToken().equals("{")) {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ",{ expected.");
@@ -196,11 +204,10 @@ public class CompilationEngine {
                 }
             }
 
-            while (!tokenizer.getTokenStrings().peek().equals("}"))
+            while (!tokenizer.getToken().equals("}"))
                 compileStatements();
 
-            tokenizer.advance();
-            createAndAppendElement(tokenizer.getToken(), "}");
+            createAndAppendElement(tokenizer.tokenType(), "}");
         }
     }
 
@@ -210,7 +217,44 @@ public class CompilationEngine {
         curRoot = parameterListElement;
 
         createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        tokenizer.advance();
+        if (tokenizer.getToken().matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
+            createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+        } else {
+            throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
+        }
 
+        // Read other token,until ")"
+        tokenizer.advance();
+        while (!tokenizer.getToken().equals(")")) {
+            // The next expected token is ",".
+            if (tokenizer.getToken().equals(",")) {
+                createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+            } else {
+                throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", \",\" expected");
+            }
+            tokenizer.advance();
+
+            // The next expected token is identifier.
+            if (tokenizer.getToken().matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
+                createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+            } else {
+                throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
+            }
+            tokenizer.advance();
+
+            // The next expected token is identifier.
+            if (tokenizer.getToken().matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
+                createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
+            } else {
+                throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
+            }
+            tokenizer.advance();
+        }
+
+        // Add the ")" in the front of the queue.
+        tokenizer.putBack();
+        this.curRoot = (Element) this.curRoot.getParentNode();
     }
 
     public void compileVarDec() {
@@ -218,8 +262,10 @@ public class CompilationEngine {
         this.curRoot.appendChild(varDec);
         this.curRoot = varDec;
 
+        // Get "var" token firstly.
         createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
 
+        // The next expected token is type.
         tokenizer.advance();
         if (tokenizer.getToken().matches("^[a-zA-Z_]{1}[a-zA-Z0-9_]*")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -264,7 +310,7 @@ public class CompilationEngine {
         curRoot.appendChild(statementsElement);
         curRoot = statementsElement;
 
-        while (!tokenizer.getTokenStrings().peek().equals("}")) {
+        while (!tokenizer.getToken().equals("}")) {
             switch (tokenizer.getToken()) {
                 case "let":
                     compileLet();
@@ -276,7 +322,7 @@ public class CompilationEngine {
                     compileWhile();
                     break;
                 case "do":
-                    compileDo(); // TODO
+                    compileDo();
                     break;
                 case "return":
                     compileReturn();
@@ -376,9 +422,9 @@ public class CompilationEngine {
         tokenizer.advance();
 
         // The next expected token is "[" or "=".
-        int startBrackets = 0;
+        boolean startBrackets = false;
         if (tokenizer.getToken().equals("[")) {
-            startBrackets = ~startBrackets;
+            startBrackets = true;
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
         } else if (tokenizer.getToken().equals("=")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -396,11 +442,11 @@ public class CompilationEngine {
         }
 
         // The right brackets
-        if (startBrackets == -1) {
+        if (startBrackets) {
             // next expected token is right brackets
             tokenizer.advance();
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
-            startBrackets = ~startBrackets;
+            startBrackets = false;
 
             // next token "="?
             tokenizer.advance();
@@ -440,10 +486,8 @@ public class CompilationEngine {
         this.curRoot.appendChild(term);
         this.curRoot = term;
 
-        // Append the current token firstly.
         createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
 
-        // next token "("
         tokenizer.advance();
         if (tokenizer.getToken().equals("(")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -451,7 +495,6 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        // next tokens expression
         tokenizer.advance();
         if (this.isExpression(tokenizer.getToken())) {
             CompileExpression();
@@ -461,7 +504,6 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        // next token ")"
         tokenizer.advance();
         if (tokenizer.getToken().equals(")")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -469,7 +511,6 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        // next token "{"
         tokenizer.advance();
         if (tokenizer.getToken().equals("{")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -477,23 +518,20 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        // next token statements
         tokenizer.advance();
-        if (this.isStatement(tokenizer.getToken())) {
+        if (this.isStatement(tokenizer.getToken()))
             compileStatements();
-        } else if (tokenizer.getToken().equals("}")) {
+        else if (tokenizer.getToken().equals("}"))
             tokenizer.putBack();
-        } else {
+        else {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        // next token "}"
-        tokenizer.advance();
-        if (tokenizer.getToken().equals("}")) {
+        if (tokenizer.getToken().equals("}"))
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
-        } else {
+        else
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
-        }
+
         this.curRoot = (Element) this.curRoot.getParentNode();
     }
 
@@ -667,27 +705,22 @@ public class CompilationEngine {
         this.curRoot = term;
 
         // integer constant
-        if (tokenizer.tokenType().equals(TokenType.INT_CONST)) {
+        if (tokenizer.tokenType().equals("integerConstant")) {
             int num = Integer.parseInt(tokenizer.getToken());
             if (num >= 0 && num < 32767) {
                 createAndAppendElement("integerConstant", num + "");
             } else {
                 throw new RuntimeException("Integer over than max Integer: " + tokenizer.getToken());
             }
-            // string constant
-        } else if (tokenizer.tokenType().equals(TokenType.STRING_CONST)) {
-            // throw the beginning symbol " and the end symbol "
+        } else if (tokenizer.tokenType().equals("stringConstant")) {
             createAndAppendElement("stringConstant",
                     tokenizer.getToken().substring(1, tokenizer.getToken().length() - 1));
-            // key word constant
         } else if (tokenizer.getToken().equals("true") ||
                 tokenizer.getToken().equals("false") ||
                 tokenizer.getToken().equals("null") ||
                 tokenizer.getToken().equals("this")) {
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
-            // varName...
-        } else if (tokenizer.tokenType().equals(TokenType.IDENTIFIER)) {
-            // Check the head of the queue.
+        } else if (tokenizer.tokenType().equals("identifier")) {
             String head = tokenizer.getTokenStrings().peek();
             // mean the structure is varName [expression]
             if (head.equals("[")) {
@@ -781,17 +814,13 @@ public class CompilationEngine {
                 }
                 // means the next token is a symbol, we just append the current identifier
             } else if (head.matches("\\+|-|\\*|/|\\&|\\||<|=|>")) {
-                // append varName
                 createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
-                // Means this term meet the end.
             } else if (head.equals(")") || head.equals("]") || head.equals(";") || head.equals(",")) {
-                // append varName
                 createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
             } else {
                 throw new RuntimeException(
                         "subroutine call error: " + tokenizer.getToken() + " unexpected.");
             }
-            // means the structure is ( expression )
         } else if (tokenizer.getToken().equals("(")) {
             // append "(" firstly
             createAndAppendElement(tokenizer.tokenType(), tokenizer.getToken());
@@ -840,7 +869,7 @@ public class CompilationEngine {
         }
 
         // next token maybe "," or ")"
-        if (tokenizer.getTokenStrings().peek().equals(",")) {
+        if (tokenizer.getToken().equals(",")) {
             String curToken = tokenizer.getTokenStrings().peek();
             while (!curToken.equals(")")) {
                 if (curToken.equals(",")) {

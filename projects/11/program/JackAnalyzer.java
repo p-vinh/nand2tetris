@@ -1,4 +1,4 @@
-package SyntaxAnalyzer;
+
 
 import java.io.File;
 public class JackAnalyzer {

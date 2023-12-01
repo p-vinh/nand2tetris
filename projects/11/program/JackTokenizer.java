@@ -1,9 +1,10 @@
-package SyntaxAnalyzer;
+
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.LinkedList;
 import java.util.Set;
@@ -42,7 +43,7 @@ public class JackTokenizer {
     }
 
     public void putBack() {
-        this.tokenStrings.addFirst(currentToken);
+        tokenStrings.addFirst(currentToken);
     }
 
     /*
@@ -175,7 +176,7 @@ public class JackTokenizer {
         return this.currentToken;
     }
 
-    public Deque<String> getTokenStrings() {
-        return this.tokenStrings;
+    public Queue<String> getTokenStrings() {
+        return tokenStrings;
     }
 }
