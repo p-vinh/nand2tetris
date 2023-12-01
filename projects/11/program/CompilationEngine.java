@@ -70,6 +70,20 @@ public class CompilationEngine {
             throw new RuntimeException("Expected }");
     }
 
+    private boolean isExpression(String curToken) {
+        if (curToken.matches("^[0-9]+") ||
+                (curToken.substring(0, 1).equals("\"") && curToken.substring(0, 1).equals("\"")) ||
+                curToken.equals("true") || curToken.equals("false") ||
+                curToken.equals("null") || curToken.equals("this") ||
+                curToken.matches(regex) ||
+                curToken.equals("(") || curToken.equals("-") ||
+                curToken.equals("~")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void CompileClassVarDec() {
         String name = "";
         String type = "";
@@ -211,7 +225,19 @@ public class CompilationEngine {
     }
 
     public void compileReturn() {
-
+        tokenizer.advance();
+        if (tokenizer.getToken().equals(";")) {
+            tokenizer.putBack();
+            vmWriter.writePush("constant", 0);
+        } else if (isExpression(tokenizer.getToken()))
+            compileExpression();
+        else
+            throw new RuntimeException("Expected ; or expression");
+        
+        tokenizer.advance();
+        if (!tokenizer.getToken().equals(";"))
+            throw new RuntimeException("Expected ;");
+        vmWriter.writeReturn();
     }
 
     public void compileWhile() {
@@ -222,15 +248,15 @@ public class CompilationEngine {
 
     }
 
-    public void CompileExpression() {
+    public void compileExpression() {
 
     }
 
-    public void CompileTerm() {
+    public void compileTerm() {
 
     }
 
-    public void CompileExpressionList() {
+    public void compileExpressionList() {
 
     }
 
