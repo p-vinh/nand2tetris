@@ -1,8 +1,7 @@
 {
     "java.project.sourcePaths": [
-        "projects/10",
         "projects/07",
         "projects/06",
-        "projects/11/program"
+        "projects/11/compiler"
     ]
 }

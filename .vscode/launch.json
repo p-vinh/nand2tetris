@@ -8,6 +8,13 @@
             "type": "java",
             "name": "JackAnalyzer",
             "request": "launch",
+            "mainClass": "compiler.JackAnalyzer",
+            "projectName": ""
+        },
+        {
+            "type": "java",
+            "name": "JackAnalyzer",
+            "request": "launch",
             "mainClass": "JackAnalyzer",
             "projectName": "nand2tetris_937a9ed"
         },

@@ -1,8 +1,6 @@
 
-
 import java.io.File;
 public class JackAnalyzer {
-
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Usage: java JackAnalyzer <file.jack|dir>");
