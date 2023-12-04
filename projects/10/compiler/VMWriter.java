@@ -35,33 +35,34 @@ public class VMWriter {
         writer.flush();
     }
 
-    public void writeArithmetic(Command command) {
+    public void writeArithmetic(String command) {
+        
         switch (command) {
-            case ADD:
+            case "+":
                 write("add");
                 break;
-            case SUB:
+            case "-":
                 write("sub");
                 break;
-            case NEG:
+            case "--":
                 write("neg");
                 break;
-            case EQ:
+            case "=":
                 write("eq");
                 break;
-            case GT:
+            case ">":
                 write("gt");
                 break;
-            case LT:
+            case "<":
                 write("lt");
                 break;
-            case AND:
+            case "&":
                 write("and");
                 break;
-            case OR:    
+            case "|":    
                 write("or");
                 break;
-            case NOT:
+            case "~":
                 write("not");
                 break;
             default:

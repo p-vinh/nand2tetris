@@ -64,7 +64,6 @@ public class CompilationEngine {
         }
 
         tokenizer.advance();
-
         if (!tokenizer.getToken().equals("}"))
             throw new RuntimeException("Expected }");
     }
@@ -130,20 +129,8 @@ public class CompilationEngine {
         boolean isMethod = tokenizer.getToken().equals("method") ? true : false;
 
         // Write function declaration
-        vmWriter.getWriter().println("function " + className + ".");
-
-        // Write constructor declaration
-        if (isConstructor) {
-            vmWriter.writePush("constant", symbolTable.varCount(SymbolTable.Kind.FIELD));
-            vmWriter.writeCall("Memory.alloc", 1);
-            vmWriter.writePop("pointer", 0);
-        }
-
-        // Write method declaration
-        if (isMethod) {
-            vmWriter.writePush("argument", 0);
-            vmWriter.writePop("pointer", 0);
-        }
+        vmWriter.getWriter().write("function " + className + ".");
+        vmWriter.getWriter().flush();
 
         // Get the kind | void
         tokenizer.advance();
@@ -157,7 +144,7 @@ public class CompilationEngine {
         if (!tokenizer.getToken().matches(regex)) {
             throw new RuntimeException("Expected name declaration expected");
         } else {
-            vmWriter.getWriter().write(tokenizer.getToken());
+            vmWriter.getWriter().print(tokenizer.getToken());
             vmWriter.getWriter().flush();
         }
 
@@ -169,36 +156,62 @@ public class CompilationEngine {
 
         // Get parameter list
         tokenizer.advance();
-        if (!tokenizer.getToken().equals(")")) {
+        boolean label = true;
+        if (tokenizer.getToken().equals(")"))
+            label = false;
+        else if (tokenizer.getToken().matches(regex)) {
+            // If the is a method, the first argument is "this".
+            if (isMethod)
+                symbolTable.define("this", className, SymbolTable.Kind.ARG);
             compileParameterList();
-        }
+        } else
+            throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected.");
 
-        // Get )
-        if (!tokenizer.getToken().equals(")")) {
-            throw new RuntimeException("Expected )");
-        }
+        // compile sixth token: )
+        if (label)
+            tokenizer.advance();
 
         // Get {
         tokenizer.advance();
         if (!tokenizer.getToken().equals("{")) {
             throw new RuntimeException("Expected {");
-        }
+        } else {
+            // Get var dec
+            tokenizer.advance();
+            if (tokenizer.getToken().equals("var")) {
+                while (tokenizer.getToken().equals("var")) {
+                    compileVarDec();
+                    tokenizer.advance();
+                }
 
-        // Get var dec
-        tokenizer.advance();
-        while (tokenizer.getToken().equals("var")) {
-            compileVarDec();
+                vmWriter.getWriter().write(" " + symbolTable.varCount(SymbolTable.Kind.VAR) + "\n");
+                vmWriter.getWriter().flush();
+            } else {
+                vmWriter.getWriter().write(" 0\n");
+                vmWriter.getWriter().flush();
+            }
+
+            // Write constructor declaration
+            if (isConstructor) {
+                vmWriter.writePush("constant", symbolTable.varCount(SymbolTable.Kind.FIELD));
+                vmWriter.writeCall("Memory.alloc", 1);
+                vmWriter.writePop("pointer", 0);
+            }
+
+            // Write method declaration
+            if (isMethod) {
+                vmWriter.writePush("argument", 0);
+                vmWriter.writePop("pointer", 0);
+            }
+
+            // Statements
+            while (!tokenizer.getToken().equals("}"))
+                compileStatements();
+
             tokenizer.advance();
         }
 
-        // Get Body
-        compileStatements();
-
-        // Get }
-        tokenizer.advance();
-        if (!tokenizer.getToken().equals("}")) {
-            throw new RuntimeException("Expected }");
-        }
+        symbolTable.reset();
     }
 
     public void compileParameterList() {
@@ -306,7 +319,6 @@ public class CompilationEngine {
             }
         }
 
-        // Put back }
         tokenizer.putBack();
     }
 
@@ -352,13 +364,13 @@ public class CompilationEngine {
         if (!isExpression(tokenizer.getToken())) {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected token!");
         } else {
-            compileExpression(); // TODO
+            compileExpression();
         }
 
         if (isArray) {
             String segmentName = transKind(symbolTable.kindOf(name));
             vmWriter.writePush(segmentName, symbolTable.indexOf(name));
-            vmWriter.writeArithmetic(VMWriter.Command.ADD);
+            vmWriter.writeArithmetic("+");
         }
 
         if (startBracket) {
@@ -377,11 +389,10 @@ public class CompilationEngine {
             if (!isExpression(tokenizer.getToken())) {
                 throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected token!");
             } else {
-                compileExpression(); // TODO
+                compileExpression();
             }
 
             // Get ;
-            tokenizer.advance();
             if (!tokenizer.getToken().equals(";")) {
                 throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected token!");
             }
@@ -404,6 +415,8 @@ public class CompilationEngine {
         } else {
             vmWriter.writePop(segmentName, symbolTable.indexOf(name));
         }
+        
+        tokenizer.advance();
     }
 
     public void compileDo() {
@@ -459,7 +472,6 @@ public class CompilationEngine {
         if (isExpression(tokenizer.getToken()))
             compileExpressionList();
 
-        tokenizer.advance();
         if (!tokenizer.getToken().equals(")"))
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected, ) expected.");
 
@@ -467,6 +479,7 @@ public class CompilationEngine {
         if (!tokenizer.getToken().equals(";"))
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected, ) expected.");
 
+        tokenizer.advance();
         vmWriter.writeCall(callName, expressionNum);
         expressionNum = 0; // clear this variable.
         vmWriter.writePop("temp", 0);
@@ -486,6 +499,7 @@ public class CompilationEngine {
         if (!tokenizer.getToken().equals(";"))
             throw new RuntimeException("Expected ;");
         vmWriter.writeReturn();
+        tokenizer.advance();
     }
 
     public void compileWhile() {
@@ -510,7 +524,7 @@ public class CompilationEngine {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
 
-        vmWriter.writeArithmetic(VMWriter.Command.NOT);
+        vmWriter.writeArithmetic("~");
         vmWriter.writeIf("WHILE_END" + originIndex);
 
         tokenizer.advance();
@@ -532,6 +546,9 @@ public class CompilationEngine {
         if (!tokenizer.getToken().equals("}")) {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
         }
+
+        // goto next statements
+        tokenizer.advance();
         this.vmWriter.writeGoto("WHILE_EXP" + originIndex);
         this.vmWriter.writeLabel("WHILE_END" + originIndex);
     }
@@ -545,9 +562,9 @@ public class CompilationEngine {
                 tokenizer.getToken().equals(";") ||
                 tokenizer.getToken().equals(",");
         while (!endFlag) {
-            String op = null;
+            String operator = null;
             if (tokenizer.getToken().matches("\\+|-|\\*|/|\\&|\\||<|=|>"))
-                op = tokenizer.getToken();
+                operator = tokenizer.getToken();
             else
                 throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected");
             tokenizer.advance();
@@ -555,12 +572,12 @@ public class CompilationEngine {
             if (isExpression(curToken))
                 compileTerm();
 
-            if (op.equals("*"))
+            if (operator.equals("*"))
                 this.vmWriter.writeCall("Math.multiply", 2);
-            else if (op.equals("/"))
+            else if (operator.equals("/"))
                 this.vmWriter.writeCall("Math.divide", 2);
             else
-                this.vmWriter.writeArithmetic(VMWriter.Command.valueOf(op.toUpperCase()));
+                this.vmWriter.writeArithmetic(operator);
 
             tokenizer.advance();
             endFlag = tokenizer.getToken().equals("]") ||
@@ -590,7 +607,7 @@ public class CompilationEngine {
         while (isOperator) {
             String operator = "";
 
-            if (tokenizer.getToken().matches(operator))
+            if (tokenizer.getToken().matches("\\+|-|\\*|/|\\&|\\||<|=|>"))
                 operator = tokenizer.getToken();
             else
                 throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected token!");
@@ -608,7 +625,7 @@ public class CompilationEngine {
             else if (operator.equals("*"))
                 vmWriter.writeCall("Math.multiply", 2);
             else
-                vmWriter.writeArithmetic(VMWriter.Command.valueOf(operator.toUpperCase()));
+                vmWriter.writeArithmetic(operator);
 
             tokenizer.advance();
 
@@ -632,9 +649,7 @@ public class CompilationEngine {
                 throw new RuntimeException("Integer over than max Integer: " + tokenizer.getToken());
 
         } else if (tokenizer.tokenType().equals("stringConstant")) { // String test
-            String stripString = tokenizer.getToken().substring(1,
-                    tokenizer.getToken().length() - 1);
-            char[] charString = stripString.toCharArray();
+            char[] charString = tokenizer.getToken().toCharArray();
 
             vmWriter.writePush("constant", charString.length);
             vmWriter.writeCall("String.new", 1);
@@ -651,7 +666,7 @@ public class CompilationEngine {
             switch (tokenizer.getToken()) {
                 case "true":
                     vmWriter.writePush("constant", 0);
-                    vmWriter.writeArithmetic(VMWriter.Command.NOT);
+                    vmWriter.writeArithmetic("~");
                     break;
                 case "false":
                     vmWriter.writePush("constant", 0);
@@ -668,11 +683,9 @@ public class CompilationEngine {
         } else if (tokenizer.tokenType().equals("identifier")) {
             // Used to memory the subroutine name.
             String subName = tokenizer.getToken();
-            tokenizer.advance();
-            String head = tokenizer.getToken();
-            tokenizer.putBack();
+
+            String head = tokenizer.getTokenStrings().peek();
             if (head.equals("[")) {
-                tokenizer.putBack();
                 // Get "[".
                 tokenizer.advance();
                 tokenizer.advance();
@@ -689,7 +702,7 @@ public class CompilationEngine {
                     throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
                 }
 
-                vmWriter.writeArithmetic(VMWriter.Command.ADD);
+                vmWriter.writeArithmetic("+");
                 vmWriter.writePop("pointer", 1);
                 vmWriter.writePush("that", 0);
 
@@ -743,10 +756,8 @@ public class CompilationEngine {
                         } else if (isExpression(tokenizer.getToken()))
                             compileExpressionList();
 
-                        tokenizer.advance();
                         if (!tokenizer.getToken().equals(")"))
                             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
-
                     } else
                         throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
 
@@ -764,8 +775,8 @@ public class CompilationEngine {
                     this.vmWriter.writePush(segmentName, symbolTable.indexOf(tokenizer.getToken()));
                 }
             } else if (head.equals(")") || head.equals("]") || head.equals(";") || head.equals(",")) {
-                String segmentName = this.transKind(symbolTable.kindOf(tokenizer.getToken()));
-                this.vmWriter.writePush(segmentName, symbolTable.indexOf(tokenizer.getToken()));
+                String segmentName = transKind(symbolTable.kindOf(tokenizer.getToken()));
+                vmWriter.writePush(segmentName, symbolTable.indexOf(tokenizer.getToken()));
             } else {
                 throw new RuntimeException("Subroutine call error: " + tokenizer.getToken() + " unexpected.");
             }
@@ -783,7 +794,7 @@ public class CompilationEngine {
             }
             // Means this structure is "unaryOp term"
         } else if (tokenizer.getToken().matches("\\-|~")) {
-            String op = tokenizer.getToken().equals("-") ? "--" : "~";
+            String operator = tokenizer.getToken().equals("-") ? "--" : "~";
 
             // Means that the next is an expression.
             if (tokenizer.getToken().equals("(")) {
@@ -798,7 +809,7 @@ public class CompilationEngine {
                 throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
             }
 
-            this.vmWriter.writeArithmetic(VMWriter.Command.valueOf(op.toUpperCase()));
+            this.vmWriter.writeArithmetic(operator);
         } else
             throw new RuntimeException(
                     "Term token compile error: " + tokenizer.getToken() + " unexpected.");
