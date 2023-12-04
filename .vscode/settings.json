@@ -2,6 +2,7 @@
     "java.project.sourcePaths": [
         "projects/07",
         "projects/06",
-        "projects/11/compiler"
+        "projects/11/compiler",
+        "projects/10/SyntaxAnalyzer"
     ]
 }

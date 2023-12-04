@@ -415,7 +415,7 @@ public class CompilationEngine {
         } else {
             vmWriter.writePop(segmentName, symbolTable.indexOf(name));
         }
-        
+
         tokenizer.advance();
     }
 
@@ -475,7 +475,7 @@ public class CompilationEngine {
         if (!tokenizer.getToken().equals(")"))
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected, ) expected.");
 
-        tokenizer.advance();
+         tokenizer.advance();
         if (!tokenizer.getToken().equals(";"))
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + ", unexpected, ) expected.");
 
@@ -817,7 +817,12 @@ public class CompilationEngine {
     }
 
     public void compileExpressionList() {
+        boolean isPrintln = false;
         tokenizer.advance();
+
+        if (tokenizer.getToken().equals(")")) {
+            isPrintln = true;
+        }
         if (tokenizer.tokenType() == "stringConstant" || isExpression(tokenizer.getToken())) {
             compileExpression();
         }
@@ -825,7 +830,7 @@ public class CompilationEngine {
 
         // next token maybe "," or ")"
         if (tokenizer.getToken().equals(",")) {
-            String curToken = tokenizer.getToken();
+            String curToken = tokenizer.getTokenStrings().peek();
             while (!curToken.equals(")")) {
                 if (curToken.equals(","))
                     tokenizer.advance();
@@ -838,10 +843,11 @@ public class CompilationEngine {
                     compileExpression();
                 } else
                     throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
-                curToken = tokenizer.getToken();
+                curToken = tokenizer.getTokenStrings().peek();
             }
         } else if (tokenizer.getToken().equals(")")) {
-            tokenizer.advance();
+            if (!isPrintln)
+                tokenizer.advance();
         } else {
             throw new RuntimeException("Syntax error: " + tokenizer.getToken() + " unexpected.");
         }
